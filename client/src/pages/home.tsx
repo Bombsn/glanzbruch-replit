@@ -7,6 +7,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useState } from "react";
+import ProductCard from "@/components/product-card";
 import type { Product, CourseType } from "@shared/schema";
 
 const Home = () => {
@@ -151,26 +152,7 @@ const Home = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {featuredProducts.map((product) => (
-              <Link key={product.id} href="/shop">
-                <div className="group cursor-pointer">
-                  <Card className="bg-white rounded-xl overflow-hidden shadow-lg group-hover:shadow-xl transition-all duration-300 transform group-hover:-translate-y-2">
-                    <img
-                      src={product.imageUrls[0]}
-                      alt={product.name}
-                      className="w-full h-48 object-cover"
-                      data-testid={`featured-product-${product.id}`}
-                    />
-                    <CardContent className="p-6">
-                      <h3 className="font-heading text-xl font-semibold text-forest mb-2">{product.name}</h3>
-                      <p className="text-charcoal/70 text-sm mb-4">Zarte Schmuckstücke mit eingefassten Naturschätzen</p>
-                      <div className="flex items-center justify-between">
-                        <span className="text-gold font-semibold">ab CHF {parseFloat(product.price).toFixed(2)}</span>
-                        <ChevronDown className="text-sage group-hover:translate-x-1 transition-transform rotate-[-90deg]" />
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </Link>
+              <ProductCard key={product.id} product={product} />
             ))}
           </div>
 
