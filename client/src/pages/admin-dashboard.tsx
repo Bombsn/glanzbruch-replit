@@ -8,13 +8,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Calendar, Clock, Users, Plus, Edit, Trash2, LogOut, Home as HomeIcon } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Calendar, Clock, Users, Plus, Edit, Trash2, LogOut, Home as HomeIcon, Package, BookOpen, ShoppingBag } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertCourseSchema, type CourseType, type CourseWithType, type InsertCourse } from "@shared/schema";
+import { insertCourseSchema, type CourseType, type CourseWithType, type InsertCourse, type Product } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
+import { ProductList } from "@/components/admin/product-list";
+import { ProductForm } from "@/components/admin/product-form";
 
 const AdminDashboard = () => {
   const [, setLocation] = useLocation();
@@ -22,6 +25,9 @@ const AdminDashboard = () => {
   const [editingCourse, setEditingCourse] = useState<CourseWithType | null>(null);
   const [courseToDelete, setCourseToDelete] = useState<CourseWithType | null>(null);
   const [creatingCourse, setCreatingCourse] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [creatingProduct, setCreatingProduct] = useState(false);
+  const [activeTab, setActiveTab] = useState("overview");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -262,7 +268,7 @@ const AdminDashboard = () => {
               Admin Dashboard
             </h1>
             <p className="text-charcoal/70">
-              Verwalten Sie Ihre Kurse und Termine
+              Verwalten Sie Produkte, Kurse und Termine
             </p>
           </div>
           
@@ -286,50 +292,106 @@ const AdminDashboard = () => {
           </div>
         </div>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-charcoal/70">Aktive Kurse</p>
-                  <p className="text-2xl font-bold text-forest">
-                    {courses.filter(c => c.status === "scheduled").length}
-                  </p>
-                </div>
-                <Calendar className="h-8 w-8 text-gold" />
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-charcoal/70">Verfügbare Plätze</p>
-                  <p className="text-2xl font-bold text-forest">
-                    {courses.reduce((sum, course) => sum + course.availableSpots, 0)}
-                  </p>
-                </div>
-                <Users className="h-8 w-8 text-gold" />
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-charcoal/70">Kurstypen</p>
-                  <p className="text-2xl font-bold text-forest">{courseTypes.length}</p>
-                </div>
-                <Clock className="h-8 w-8 text-gold" />
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+        {/* Tabs Navigation */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="overview" className="flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              Übersicht
+            </TabsTrigger>
+            <TabsTrigger value="products" className="flex items-center gap-2">
+              <Package className="w-4 h-4" />
+              Produkte
+            </TabsTrigger>
+            <TabsTrigger value="courses" className="flex items-center gap-2">
+              <BookOpen className="w-4 h-4" />
+              Kurse
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Existing Courses */}
+          {/* Overview Tab */}
+          <TabsContent value="overview" className="space-y-6">
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Gesamte Produkte</CardTitle>
+                  <Package className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-forest">-</div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Aktive Kurse</CardTitle>
+                  <BookOpen className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-forest">
+                    {courses.filter(course => course.status === "scheduled").length}
+                  </div>
+                </CardContent>
+              </Card>
+              
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Kursbuchungen</CardTitle>
+                  <Users className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold text-forest">
+                    {courseBookings.length}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Quick Actions */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Schnellaktionen</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Button
+                    onClick={() => {
+                      setActiveTab("products");
+                      setCreatingProduct(true);
+                    }}
+                    className="justify-start bg-forest hover:bg-forest/80 text-cream"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Neues Produkt erstellen
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      setActiveTab("courses");
+                      setCreatingCourse(true);
+                    }}
+                    variant="outline"
+                    className="justify-start border-forest text-forest hover:bg-forest hover:text-cream"
+                  >
+                    <Plus className="w-4 h-4 mr-2" />
+                    Neuen Kurs erstellen
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Products Tab */}
+          <TabsContent value="products" className="space-y-6">
+            <ProductList
+              onEditProduct={setEditingProduct}
+              onCreateProduct={() => setCreatingProduct(true)}
+            />
+          </TabsContent>
+
+          {/* Courses Tab */}
+          <TabsContent value="courses" className="space-y-6">
+            {/* Existing Courses */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Aktuelle Kurstermine</CardTitle>
@@ -834,6 +896,41 @@ const AdminDashboard = () => {
                 </div>
               </form>
             </Form>
+          </DialogContent>
+        </Dialog>
+
+          </TabsContent>
+        </Tabs>
+
+        {/* Product Form Modals */}
+        <Dialog open={creatingProduct} onOpenChange={setCreatingProduct}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Neues Produkt erstellen</DialogTitle>
+            </DialogHeader>
+            <ProductForm
+              onSuccess={() => {
+                setCreatingProduct(false);
+                setActiveTab("products");
+              }}
+              onCancel={() => setCreatingProduct(false)}
+            />
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={!!editingProduct} onOpenChange={(open) => !open && setEditingProduct(null)}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Produkt bearbeiten</DialogTitle>
+            </DialogHeader>
+            <ProductForm
+              product={editingProduct || undefined}
+              onSuccess={() => {
+                setEditingProduct(null);
+                setActiveTab("products");
+              }}
+              onCancel={() => setEditingProduct(null)}
+            />
           </DialogContent>
         </Dialog>
 

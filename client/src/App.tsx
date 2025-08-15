@@ -11,6 +11,7 @@ import Courses from "@/pages/courses";
 import Gallery from "@/pages/gallery";
 import About from "@/pages/about";
 import Contact from "@/pages/contact";
+import ProductPage from "@/pages/product";
 import AdminLogin from "@/pages/admin-login";
 import AdminDashboard from "@/pages/admin-dashboard";
 import Header from "@/components/header";
@@ -26,6 +27,7 @@ function Router() {
       <Route path="/galerie" component={Gallery} />
       <Route path="/ueber-mich" component={About} />
       <Route path="/kontakt" component={Contact} />
+      <Route path="/produkt/:id" component={ProductPage} />
       <Route path="/admin" component={AdminLogin} />
       <Route path="/admin/dashboard" component={AdminDashboard} />
       <Route component={NotFound} />

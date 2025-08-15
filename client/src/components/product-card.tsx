@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ShoppingBag, ArrowRight } from "lucide-react";
 import { useCartStore } from "@/lib/store";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "wouter";
 import type { Product } from "@shared/schema";
 
 interface ProductCardProps {
@@ -44,21 +45,22 @@ const ProductCard = ({ product }: ProductCardProps) => {
 
   return (
     <Card className="group cursor-pointer overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full">
-      <div className="relative">
-        <img
-          src={product.imageUrls[0]}
-          alt={product.name}
-          className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
-          data-testid={`product-image-${product.id}`}
-        />
-        {!product.inStock && (
-          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-            <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
-              Ausverkauft
-            </span>
-          </div>
-        )}
-      </div>
+      <Link href={`/produkt/${product.id}`} className="flex flex-col h-full">
+        <div className="relative">
+          <img
+            src={product.imageUrls[0]}
+            alt={product.name}
+            className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+            data-testid={`product-image-${product.id}`}
+          />
+          {!product.inStock && (
+            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+              <span className="bg-red-500 text-white px-3 py-1 rounded-full text-sm font-medium">
+                Ausverkauft
+              </span>
+            </div>
+          )}
+        </div>
       
       <CardContent className="p-6 flex flex-col flex-1">
         <div className="mb-2">
@@ -126,6 +128,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           </Button>
         </div>
       </CardContent>
+      </Link>
     </Card>
   );
 };

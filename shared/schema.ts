@@ -12,9 +12,15 @@ export const products = pgTable("products", {
   imageUrls: text("image_urls").array().notNull(), // Multiple images
   sku: text("sku").unique(),
   inStock: boolean("in_stock").notNull().default(true),
+  stockQuantity: integer("stock_quantity").default(1),
   weight: text("weight"),
   dimensions: text("dimensions"),
   material: text("material"),
+  careInstructions: text("care_instructions"),
+  artisan: text("artisan").default("Glanzbruch Atelier"),
+  tags: text("tags").array(), // e.g., ["handmade", "vintage", "limited"]
+  isFeature: boolean("is_featured").default(false),
+  metadata: text("metadata"), // JSON string for additional flexible data
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 

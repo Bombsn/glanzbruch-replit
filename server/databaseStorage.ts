@@ -240,6 +240,19 @@ export class DatabaseStorage implements IStorage {
     return newProduct;
   }
 
+  async updateProduct(id: string, product: InsertProduct): Promise<Product | undefined> {
+    const [updatedProduct] = await db.update(products)
+      .set(product)
+      .where(eq(products.id, id))
+      .returning();
+    return updatedProduct || undefined;
+  }
+
+  async deleteProduct(id: string): Promise<boolean> {
+    const result = await db.delete(products).where(eq(products.id, id));
+    return (result.rowCount || 0) > 0;
+  }
+
   // Course Types
   async getCourseTypes(): Promise<CourseType[]> {
     return await db.select().from(courseTypes);

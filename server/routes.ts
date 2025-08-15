@@ -57,6 +57,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin Product Management Routes
+  app.get("/api/admin/products", async (req, res) => {
+    try {
+      const products = await storage.getProducts();
+      res.json(products);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch products" });
+    }
+  });
+
+  app.post("/api/admin/products", async (req, res) => {
+    try {
+      const productData = insertProductSchema.parse(req.body);
+      const newProduct = await storage.createProduct(productData);
+      res.status(201).json(newProduct);
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(400).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: "Failed to create product" });
+      }
+    }
+  });
+
+  app.put("/api/admin/products/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const productData = insertProductSchema.parse(req.body);
+      const updatedProduct = await storage.updateProduct(id, productData);
+      if (!updatedProduct) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+      res.json(updatedProduct);
+    } catch (error) {
+      if (error instanceof Error) {
+        res.status(400).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: "Failed to update product" });
+      }
+    }
+  });
+
+  app.delete("/api/admin/products/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const deleted = await storage.deleteProduct(id);
+      if (!deleted) {
+        return res.status(404).json({ message: "Product not found" });
+      }
+      res.json({ message: "Product deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete product" });
+    }
+  });
+
+  // Object Storage Routes
+  app.post("/api/objects/upload", async (req, res) => {
+    try {
+      // This would be replaced with actual object storage service
+      const uploadURL = `https://example.com/upload/${Date.now()}`;
+      res.json({ uploadURL });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get upload URL" });
+    }
+  });
+
   // Courses
   app.get("/api/courses", async (req, res) => {
     try {

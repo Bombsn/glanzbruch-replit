@@ -24,6 +24,8 @@ export interface IStorage {
   getProduct(id: string): Promise<Product | undefined>;
   getProductsByCategory(category: string): Promise<Product[]>;
   createProduct(product: InsertProduct): Promise<Product>;
+  updateProduct(id: string, product: InsertProduct): Promise<Product | undefined>;
+  deleteProduct(id: string): Promise<boolean>;
   seedProducts(): Promise<void>;
   
   // Course Types
