@@ -11,27 +11,27 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { insertCourseBookingSchema } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import type { CourseWithType } from "@shared/schema";
+import type { CourseType } from "@shared/schema";
 import type { z } from "zod";
 
 interface CourseCardProps {
-  course: CourseWithType;
+  courseType: CourseType;
 }
 
 type BookingFormData = z.infer<typeof insertCourseBookingSchema>;
 
-const CourseCard = ({ course }: CourseCardProps) => {
+const CourseCard = ({ courseType }: CourseCardProps) => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const form = useForm<BookingFormData>({
     resolver: zodResolver(insertCourseBookingSchema),
     defaultValues: {
-      courseId: course.id,
+      courseId: courseType.id,
       customerName: "",
       customerEmail: "",
       customerPhone: undefined,
-      totalPrice: course.courseType.price,
+      totalPrice: courseType.price,
       message: undefined,
     },
   });
@@ -79,20 +79,20 @@ const CourseCard = ({ course }: CourseCardProps) => {
     <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col h-full">
       <div className="relative">
         <img
-          src={course.courseType.imageUrl}
-          alt={course.courseType.name}
+          src={courseType.imageUrl}
+          alt={courseType.name}
           className="w-full h-48 object-cover"
-          data-testid={`course-image-${course.id}`}
+          data-testid={`course-image-${courseType.id}`}
         />
       </div>
       
       <CardContent className="p-6 flex flex-col flex-1">
-        <h3 className="font-heading text-xl font-semibold text-forest mb-3" data-testid={`course-title-${course.id}`}>
-          {course.courseType.name}
+        <h3 className="font-heading text-xl font-semibold text-forest mb-3" data-testid={`course-title-${courseType.id}`}>
+          {courseType.name}
         </h3>
         
-        <p className="text-charcoal/70 text-sm mb-4 leading-relaxed flex-1" data-testid={`course-description-${course.id}`}>
-          {course.courseType.description}
+        <p className="text-charcoal/70 text-sm mb-4 leading-relaxed flex-1" data-testid={`course-description-${courseType.id}`}>
+          {courseType.description}
         </p>
         
         {/* Footer section - always at bottom */}
@@ -100,11 +100,11 @@ const CourseCard = ({ course }: CourseCardProps) => {
           <div className="space-y-2 mb-6">
             <div className="flex items-center text-sm text-charcoal/70">
               <Clock className="w-4 h-4 mr-2 text-sage" />
-              <span>Dauer: {course.courseType.duration}</span>
+              <span>Dauer: {courseType.duration}</span>
             </div>
             <div className="flex items-center text-sm text-charcoal/70">
               <Users className="w-4 h-4 mr-2 text-sage" />
-              <span>Max. {course.courseType.maxParticipants} Teilnehmer</span>
+              <span>Max. {courseType.maxParticipants} Teilnehmer</span>
             </div>
             <div className="flex items-center text-sm text-charcoal/70">
               <Calendar className="w-4 h-4 mr-2 text-sage" />
@@ -113,14 +113,14 @@ const CourseCard = ({ course }: CourseCardProps) => {
           </div>
           
           <div className="flex items-center justify-between mb-4">
-            <span className="text-gold font-semibold text-xl" data-testid={`course-price-${course.id}`}>
-              {formatPrice(course.courseType.price)}
+            <span className="text-gold font-semibold text-xl" data-testid={`course-price-${courseType.id}`}>
+              {formatPrice(courseType.price)}
             </span>
           </div>
 
           <Dialog>
           <DialogTrigger asChild>
-            <Button className="w-full bg-gold hover:bg-gold/90 text-white" data-testid={`button-book-course-${course.id}`}>
+            <Button className="w-full bg-gold hover:bg-gold/90 text-white" data-testid={`button-book-course-${courseType.id}`}>
               <CalendarPlus className="w-4 h-4 mr-2" />
               Kurs buchen
             </Button>
@@ -128,7 +128,7 @@ const CourseCard = ({ course }: CourseCardProps) => {
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle className="font-heading text-xl text-forest">
-                Kurs buchen: {course.courseType.name}
+                Kurs buchen: {courseType.name}
               </DialogTitle>
             </DialogHeader>
             <Form {...form}>

@@ -1,10 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 import { Clock, Users, Calendar, Star } from "lucide-react";
 import CourseCard from "@/components/course-card";
-import type { Course } from "@shared/schema";
+import type { CourseType } from "@shared/schema";
 
 const Courses = () => {
-  const { data: courses = [], isLoading } = useQuery<Course[]>({
+  const { data: courseTypes = [], isLoading } = useQuery<CourseType[]>({
     queryKey: ["/api/courses"],
   });
 
@@ -114,7 +114,7 @@ const Courses = () => {
             Verfügbare Kurse
           </h2>
           
-          {courses.length === 0 ? (
+          {courseTypes.length === 0 ? (
             <div className="text-center py-16 bg-white rounded-xl shadow-sm">
               <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-charcoal mb-2">Momentan keine Kurse verfügbar</h3>
@@ -125,8 +125,8 @@ const Courses = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {courses.map((course) => (
-                <CourseCard key={course.id} course={course} />
+              {courseTypes.map((courseType) => (
+                <CourseCard key={courseType.id} courseType={courseType} />
               ))}
             </div>
           )}
