@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Calendar, Clock, Users, Plus, Edit, Trash2, LogOut, Home } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -19,6 +20,7 @@ const AdminDashboard = () => {
   const [, setLocation] = useLocation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [editingCourse, setEditingCourse] = useState<CourseWithType | null>(null);
+  const [courseToDelete, setCourseToDelete] = useState<CourseWithType | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -39,6 +41,11 @@ const AdminDashboard = () => {
 
   const { data: courses = [] } = useQuery<CourseWithType[]>({
     queryKey: ["/api/admin/courses"],
+    enabled: isAuthenticated,
+  });
+
+  const { data: courseBookings = [] } = useQuery({
+    queryKey: ["/api/course-bookings"],
     enabled: isAuthenticated,
   });
 
@@ -120,6 +127,7 @@ const AdminDashboard = () => {
         title: "Kurs gelöscht",
         description: "Der Kurstermin wurde erfolgreich gelöscht.",
       });
+      setCourseToDelete(null);
       queryClient.invalidateQueries({ queryKey: ["/api/admin/courses"] });
     },
     onError: () => {
@@ -130,6 +138,22 @@ const AdminDashboard = () => {
       });
     },
   });
+
+  // Get booking count for a specific course
+  const getBookingCount = (courseId: string) => {
+    return courseBookings.filter((booking: any) => booking.courseId === courseId).length;
+  };
+
+  // Handle delete course with confirmation
+  const handleDeleteCourse = (course: CourseWithType) => {
+    setCourseToDelete(course);
+  };
+
+  const confirmDeleteCourse = () => {
+    if (courseToDelete) {
+      deleteCourseMutation.mutate(courseToDelete.id);
+    }
+  };
 
   const onSubmit = (data: any) => {
     // Combine date and start time for the ISO string
@@ -509,7 +533,7 @@ const AdminDashboard = () => {
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => deleteCourseMutation.mutate(course.id)}
+                        onClick={() => handleDeleteCourse(course)}
                         disabled={deleteCourseMutation.isPending}
                       >
                         <Trash2 className="w-4 h-4" />
@@ -747,6 +771,33 @@ const AdminDashboard = () => {
             </Form>
           </DialogContent>
         </Dialog>
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={!!courseToDelete} onOpenChange={(open) => !open && setCourseToDelete(null)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Kurs wirklich löschen?</AlertDialogTitle>
+              <AlertDialogDescription className="space-y-2">
+                <p>Sind Sie sicher, dass Sie den Kurs "{courseToDelete?.title}" löschen möchten?</p>
+                {courseToDelete && getBookingCount(courseToDelete.id) > 0 && (
+                  <p className="text-red-600 font-medium">
+                    ⚠️ Achtung: Es gibt bereits {getBookingCount(courseToDelete.id)} Buchung(en) für diesen Kurs!
+                  </p>
+                )}
+                <p className="text-sm text-gray-600">Diese Aktion kann nicht rückgängig gemacht werden.</p>
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Abbrechen</AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={confirmDeleteCourse}
+                className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+              >
+                Löschen
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );
