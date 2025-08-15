@@ -46,10 +46,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Courses
   app.get("/api/courses", async (req, res) => {
     try {
-      const courses = await storage.getCourses();
-      res.json(courses);
+      // For now, return course types directly as we haven't seeded courses yet
+      const courseTypes = await storage.getCourseTypes();
+      res.json(courseTypes);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch courses" });
+    }
+  });
+
+  // Get all course types
+  app.get("/api/course-types", async (req, res) => {
+    try {
+      const courseTypes = await storage.getCourseTypes();
+      res.json(courseTypes);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch course types" });
     }
   });
 
@@ -119,6 +130,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(201).json({ message: "Erfolgreich für Newsletter angemeldet" });
     } catch (error) {
       res.status(400).json({ message: "Fehler beim Anmelden für Newsletter" });
+    }
+  });
+
+  // Seed endpoint for initial data loading
+  app.post("/api/seed-products", async (req, res) => {
+    try {
+      if ('seedProducts' in storage) {
+        await (storage as any).seedProducts();
+        res.json({ message: "Products seeded successfully" });
+      } else {
+        res.status(400).json({ message: "Seeding not supported with current storage" });
+      }
+    } catch (error) {
+      console.error("Error seeding products:", error);
+      res.status(500).json({ message: "Failed to seed products" });
     }
   });
 

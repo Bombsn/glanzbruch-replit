@@ -18,7 +18,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
       id: product.id,
       name: product.name,
       price: parseFloat(product.price),
-      imageUrl: product.imageUrl,
+      imageUrl: product.imageUrls[0],
     });
     
     toast({
@@ -46,7 +46,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
     <Card className="group cursor-pointer overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
       <div className="relative">
         <img
-          src={product.imageUrl}
+          src={product.imageUrls[0]}
           alt={product.name}
           className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
           data-testid={`product-image-${product.id}`}

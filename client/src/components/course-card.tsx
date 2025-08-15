@@ -11,11 +11,11 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { insertCourseBookingSchema } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import type { Course } from "@shared/schema";
+import type { CourseWithType } from "@shared/schema";
 import type { z } from "zod";
 
 interface CourseCardProps {
-  course: Course;
+  course: CourseWithType;
 }
 
 type BookingFormData = z.infer<typeof insertCourseBookingSchema>;
@@ -31,7 +31,7 @@ const CourseCard = ({ course }: CourseCardProps) => {
       customerName: "",
       customerEmail: "",
       customerPhone: undefined,
-      preferredDate: undefined,
+      totalPrice: course.courseType.price,
       message: undefined,
     },
   });
@@ -79,8 +79,8 @@ const CourseCard = ({ course }: CourseCardProps) => {
     <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
       <div className="relative">
         <img
-          src={course.imageUrl}
-          alt={course.title}
+          src={course.courseType.imageUrl}
+          alt={course.courseType.name}
           className="w-full h-48 object-cover"
           data-testid={`course-image-${course.id}`}
         />
@@ -88,21 +88,21 @@ const CourseCard = ({ course }: CourseCardProps) => {
       
       <CardContent className="p-6">
         <h3 className="font-heading text-xl font-semibold text-forest mb-3" data-testid={`course-title-${course.id}`}>
-          {course.title}
+          {course.courseType.name}
         </h3>
         
         <p className="text-charcoal/70 text-sm mb-4 leading-relaxed" data-testid={`course-description-${course.id}`}>
-          {course.description}
+          {course.courseType.description}
         </p>
         
         <div className="space-y-2 mb-6">
           <div className="flex items-center text-sm text-charcoal/70">
             <Clock className="w-4 h-4 mr-2 text-sage" />
-            <span>Dauer: {formatDuration(course.duration)}</span>
+            <span>Dauer: {course.courseType.duration}</span>
           </div>
           <div className="flex items-center text-sm text-charcoal/70">
             <Users className="w-4 h-4 mr-2 text-sage" />
-            <span>Max. {course.maxParticipants} Teilnehmer</span>
+            <span>Max. {course.courseType.maxParticipants} Teilnehmer</span>
           </div>
           <div className="flex items-center text-sm text-charcoal/70">
             <Calendar className="w-4 h-4 mr-2 text-sage" />
@@ -112,7 +112,7 @@ const CourseCard = ({ course }: CourseCardProps) => {
         
         <div className="flex items-center justify-between mb-4">
           <span className="text-gold font-semibold text-xl" data-testid={`course-price-${course.id}`}>
-            {formatPrice(course.price)}
+            {formatPrice(course.courseType.price)}
           </span>
         </div>
 
@@ -126,7 +126,7 @@ const CourseCard = ({ course }: CourseCardProps) => {
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
               <DialogTitle className="font-heading text-xl text-forest">
-                Kurs buchen: {course.title}
+                Kurs buchen: {course.courseType.name}
               </DialogTitle>
             </DialogHeader>
             <Form {...form}>
