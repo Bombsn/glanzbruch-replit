@@ -211,6 +211,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Update course
+  app.put("/api/admin/courses/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const data = req.body;
+      
+      // Convert date string to Date object for database
+      const courseData = {
+        ...data,
+        date: new Date(data.date),
+      };
+      
+      const updatedCourse = await storage.updateCourse(id, courseData);
+      if (updatedCourse) {
+        res.json(updatedCourse);
+      } else {
+        res.status(404).json({ message: "Kurs nicht gefunden" });
+      }
+    } catch (error) {
+      console.error("Update course error:", error);
+      res.status(500).json({ message: "Failed to update course" });
+    }
+  });
+
   // Delete course
   app.delete("/api/admin/courses/:id", async (req, res) => {
     try {

@@ -18,6 +18,7 @@ import { useLocation } from "wouter";
 const AdminDashboard = () => {
   const [, setLocation] = useLocation();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [editingCourse, setEditingCourse] = useState<CourseWithType | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -57,6 +58,22 @@ const AdminDashboard = () => {
     },
   });
 
+  const editForm = useForm({
+    defaultValues: {
+      courseTypeId: "",
+      title: "",
+      date: "",
+      startTime: "",
+      endTime: "",
+      maxParticipants: 6,
+      availableSpots: 6,
+      location: "",
+      instructor: "",
+      status: "scheduled",
+      notes: "",
+    },
+  });
+
   const createCourseMutation = useMutation({
     mutationFn: (data: InsertCourse) => apiRequest("POST", "/api/admin/courses", data),
     onSuccess: () => {
@@ -71,6 +88,26 @@ const AdminDashboard = () => {
       toast({
         title: "Fehler",
         description: "Der Kurs konnte nicht erstellt werden.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateCourseMutation = useMutation({
+    mutationFn: ({ courseId, data }: { courseId: string; data: any }) => 
+      apiRequest("PUT", `/api/admin/courses/${courseId}`, data),
+    onSuccess: () => {
+      toast({
+        title: "Kurs aktualisiert",
+        description: "Der Kurstermin wurde erfolgreich aktualisiert.",
+      });
+      setEditingCourse(null);
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/courses"] });
+    },
+    onError: () => {
+      toast({
+        title: "Fehler",
+        description: "Der Kurs konnte nicht aktualisiert werden.",
         variant: "destructive",
       });
     },
@@ -109,6 +146,46 @@ const AdminDashboard = () => {
     delete courseData.endTime;
     
     createCourseMutation.mutate(courseData);
+  };
+
+  const onEditSubmit = (data: any) => {
+    if (!editingCourse) return;
+    
+    // Combine date and start time for the ISO string
+    const dateTimeString = `${data.date}T${data.startTime}:00.000Z`;
+    
+    const courseData = {
+      ...data,
+      date: dateTimeString,
+      maxParticipants: Number(data.maxParticipants),
+      availableSpots: Number(data.availableSpots),
+    };
+    
+    delete courseData.startTime;
+    delete courseData.endTime;
+    
+    updateCourseMutation.mutate({ courseId: editingCourse.id, data: courseData });
+  };
+
+  const handleEditCourse = (course: CourseWithType) => {
+    const courseDate = new Date(course.date);
+    const formattedDate = courseDate.toISOString().split('T')[0];
+    
+    editForm.reset({
+      courseTypeId: course.courseTypeId,
+      title: course.title,
+      date: formattedDate,
+      startTime: course.startTime,
+      endTime: course.endTime,
+      maxParticipants: course.maxParticipants,
+      availableSpots: course.availableSpots,
+      location: course.location || "",
+      instructor: course.instructor || "",
+      status: course.status || "scheduled",
+      notes: course.notes || "",
+    });
+    
+    setEditingCourse(course);
   };
 
   const handleLogout = () => {
@@ -423,6 +500,15 @@ const AdminDashboard = () => {
                       <Button
                         size="sm"
                         variant="outline"
+                        onClick={() => handleEditCourse(course)}
+                        className="border-gold text-gold hover:bg-gold hover:text-white"
+                      >
+                        <Edit className="w-4 h-4" />
+                      </Button>
+                      
+                      <Button
+                        size="sm"
+                        variant="outline"
                         onClick={() => deleteCourseMutation.mutate(course.id)}
                         disabled={deleteCourseMutation.isPending}
                       >
@@ -435,6 +521,232 @@ const AdminDashboard = () => {
             )}
           </CardContent>
         </Card>
+
+        {/* Edit Course Modal */}
+        <Dialog open={!!editingCourse} onOpenChange={(open) => !open && setEditingCourse(null)}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Kurs bearbeiten</DialogTitle>
+            </DialogHeader>
+            
+            <Form {...editForm}>
+              <form onSubmit={editForm.handleSubmit(onEditSubmit)} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={editForm.control}
+                    name="courseTypeId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Kurstyp</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Wählen Sie einen Kurstyp" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {courseTypes.map((type) => (
+                              <SelectItem key={type.id} value={type.id}>
+                                {type.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={editForm.control}
+                    name="title"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Kurstitel</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="z.B. UV-Resin Ganztageskurs am 6. September" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <FormField
+                    control={editForm.control}
+                    name="date"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Datum</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={editForm.control}
+                    name="startTime"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Startzeit</FormLabel>
+                        <FormControl>
+                          <Input type="time" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={editForm.control}
+                    name="endTime"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Endzeit</FormLabel>
+                        <FormControl>
+                          <Input type="time" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={editForm.control}
+                    name="maxParticipants"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Max. Teilnehmer</FormLabel>
+                        <FormControl>
+                          <Input 
+                            {...field} 
+                            type="number" 
+                            min="1"
+                            onChange={(e) => field.onChange(parseInt(e.target.value))}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={editForm.control}
+                    name="availableSpots"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Verfügbare Plätze</FormLabel>
+                        <FormControl>
+                          <Input 
+                            {...field} 
+                            type="number" 
+                            min="0"
+                            onChange={(e) => field.onChange(parseInt(e.target.value))}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={editForm.control}
+                    name="location"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Ort</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="z.B. Glanzbruch Atelier" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={editForm.control}
+                    name="instructor"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Kursleiter</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="z.B. Glanzbruch Atelier" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                
+                <FormField
+                  control={editForm.control}
+                  name="status"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Status</FormLabel>
+                      <Select onValueChange={field.onChange} value={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="scheduled">Geplant</SelectItem>
+                          <SelectItem value="cancelled">Abgesagt</SelectItem>
+                          <SelectItem value="completed">Abgeschlossen</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={editForm.control}
+                  name="notes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Notizen (optional)</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          {...field} 
+                          placeholder="Besondere Hinweise für diesen Kurstermin..."
+                          value={field.value || ""}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <div className="flex gap-3">
+                  <Button 
+                    type="submit" 
+                    className="bg-forest hover:bg-forest/90 text-white"
+                    disabled={updateCourseMutation.isPending}
+                  >
+                    {updateCourseMutation.isPending ? "Wird aktualisiert..." : "Änderungen speichern"}
+                  </Button>
+                  <Button 
+                    type="button" 
+                    variant="outline"
+                    onClick={() => setEditingCourse(null)}
+                  >
+                    Abbrechen
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

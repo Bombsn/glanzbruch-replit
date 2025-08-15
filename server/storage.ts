@@ -34,6 +34,7 @@ export interface IStorage {
   getCourses(): Promise<Course[]>;
   getCourse(id: string): Promise<Course | undefined>;
   createCourse(course: InsertCourse): Promise<Course>;
+  updateCourse(id: string, course: Partial<InsertCourse>): Promise<Course | undefined>;
   
   // Orders
   getOrders(): Promise<Order[]>;

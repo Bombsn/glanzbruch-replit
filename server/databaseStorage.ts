@@ -294,6 +294,15 @@ export class DatabaseStorage implements IStorage {
     return newCourse;
   }
 
+  async updateCourse(id: string, courseData: Partial<InsertCourse>): Promise<Course | undefined> {
+    const [updatedCourse] = await db
+      .update(courses)
+      .set(courseData)
+      .where(eq(courses.id, id))
+      .returning();
+    return updatedCourse || undefined;
+  }
+
   // Orders
   async getOrders(): Promise<Order[]> {
     return await db.select().from(orders);
