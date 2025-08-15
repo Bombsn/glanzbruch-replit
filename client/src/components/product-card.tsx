@@ -43,7 +43,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
   };
 
   return (
-    <Card className="group cursor-pointer overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
+    <Card className="group cursor-pointer overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full">
       <div className="relative">
         <img
           src={product.imageUrls[0]}
@@ -60,7 +60,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         )}
       </div>
       
-      <CardContent className="p-6">
+      <CardContent className="p-6 flex flex-col flex-1">
         <div className="mb-2">
           <span className="text-xs text-sage font-medium uppercase tracking-wide">
             {getCategoryName(product.category)}
@@ -71,26 +71,29 @@ const ProductCard = ({ product }: ProductCardProps) => {
           {product.name}
         </h3>
         
-        <p className="text-charcoal/70 text-sm mb-4 line-clamp-2" data-testid={`product-description-${product.id}`}>
+        <p className="text-charcoal/70 text-sm mb-4 flex-1" data-testid={`product-description-${product.id}`}>
           {product.description}
         </p>
         
-        <div className="flex items-center justify-between">
-          <span className="text-gold font-semibold text-lg" data-testid={`product-price-${product.id}`}>
-            {formatPrice(product.price)}
-          </span>
-          <ArrowRight className="text-sage w-5 h-5 group-hover:translate-x-1 transition-transform" />
+        {/* Footer section - always at bottom */}
+        <div className="mt-auto">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-gold font-semibold text-lg" data-testid={`product-price-${product.id}`}>
+              {formatPrice(product.price)}
+            </span>
+            <ArrowRight className="text-sage w-5 h-5 group-hover:translate-x-1 transition-transform" />
+          </div>
+          
+          <Button
+            onClick={handleAddToCart}
+            disabled={!product.inStock}
+            className="w-full bg-forest hover:bg-forest/90 text-white"
+            data-testid={`button-add-to-cart-${product.id}`}
+          >
+            <ShoppingBag className="w-4 h-4 mr-2" />
+            {product.inStock ? "In den Warenkorb" : "Ausverkauft"}
+          </Button>
         </div>
-        
-        <Button
-          onClick={handleAddToCart}
-          disabled={!product.inStock}
-          className="w-full mt-4 bg-forest hover:bg-forest/90 text-white"
-          data-testid={`button-add-to-cart-${product.id}`}
-        >
-          <ShoppingBag className="w-4 h-4 mr-2" />
-          {product.inStock ? "In den Warenkorb" : "Ausverkauft"}
-        </Button>
       </CardContent>
     </Card>
   );

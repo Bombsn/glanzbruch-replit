@@ -76,7 +76,7 @@ const CourseCard = ({ course }: CourseCardProps) => {
   };
 
   return (
-    <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
+    <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col h-full">
       <div className="relative">
         <img
           src={course.courseType.imageUrl}
@@ -86,37 +86,39 @@ const CourseCard = ({ course }: CourseCardProps) => {
         />
       </div>
       
-      <CardContent className="p-6">
+      <CardContent className="p-6 flex flex-col flex-1">
         <h3 className="font-heading text-xl font-semibold text-forest mb-3" data-testid={`course-title-${course.id}`}>
           {course.courseType.name}
         </h3>
         
-        <p className="text-charcoal/70 text-sm mb-4 leading-relaxed" data-testid={`course-description-${course.id}`}>
+        <p className="text-charcoal/70 text-sm mb-4 leading-relaxed flex-1" data-testid={`course-description-${course.id}`}>
           {course.courseType.description}
         </p>
         
-        <div className="space-y-2 mb-6">
-          <div className="flex items-center text-sm text-charcoal/70">
-            <Clock className="w-4 h-4 mr-2 text-sage" />
-            <span>Dauer: {course.courseType.duration}</span>
+        {/* Footer section - always at bottom */}
+        <div className="mt-auto">
+          <div className="space-y-2 mb-6">
+            <div className="flex items-center text-sm text-charcoal/70">
+              <Clock className="w-4 h-4 mr-2 text-sage" />
+              <span>Dauer: {course.courseType.duration}</span>
+            </div>
+            <div className="flex items-center text-sm text-charcoal/70">
+              <Users className="w-4 h-4 mr-2 text-sage" />
+              <span>Max. {course.courseType.maxParticipants} Teilnehmer</span>
+            </div>
+            <div className="flex items-center text-sm text-charcoal/70">
+              <Calendar className="w-4 h-4 mr-2 text-sage" />
+              <span>Nach Vereinbarung</span>
+            </div>
           </div>
-          <div className="flex items-center text-sm text-charcoal/70">
-            <Users className="w-4 h-4 mr-2 text-sage" />
-            <span>Max. {course.courseType.maxParticipants} Teilnehmer</span>
+          
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-gold font-semibold text-xl" data-testid={`course-price-${course.id}`}>
+              {formatPrice(course.courseType.price)}
+            </span>
           </div>
-          <div className="flex items-center text-sm text-charcoal/70">
-            <Calendar className="w-4 h-4 mr-2 text-sage" />
-            <span>Nach Vereinbarung</span>
-          </div>
-        </div>
-        
-        <div className="flex items-center justify-between mb-4">
-          <span className="text-gold font-semibold text-xl" data-testid={`course-price-${course.id}`}>
-            {formatPrice(course.courseType.price)}
-          </span>
-        </div>
 
-        <Dialog>
+          <Dialog>
           <DialogTrigger asChild>
             <Button className="w-full bg-gold hover:bg-gold/90 text-white" data-testid={`button-book-course-${course.id}`}>
               <CalendarPlus className="w-4 h-4 mr-2" />
@@ -175,37 +177,19 @@ const CourseCard = ({ course }: CourseCardProps) => {
                 
                 <FormField
                   control={form.control}
-                  name="preferredDate"
+                  name="message"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Wunschtermin</FormLabel>
+                      <FormLabel>Wunschtermin & Nachricht</FormLabel>
                       <FormControl>
-                        <Input placeholder="z.B. 'Samstag Nachmittag' oder '15.12.2024'" {...field} value={field.value || ""} data-testid="input-preferred-date" />
+                        <Textarea placeholder="z.B. 'Samstag Nachmittag' oder '15.12.2024' sowie weitere Wünsche..." {...field} value={field.value || ""} data-testid="textarea-preferred-date" />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
                 
-                <FormField
-                  control={form.control}
-                  name="message"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nachricht</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          placeholder="Besondere Wünsche oder Fragen zum Kurs..." 
-                          className="resize-none" 
-                          {...field} 
-                          value={field.value || ""}
-                          data-testid="textarea-message"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+
                 
                 <Button 
                   type="submit" 
@@ -219,6 +203,7 @@ const CourseCard = ({ course }: CourseCardProps) => {
             </Form>
           </DialogContent>
         </Dialog>
+        </div>
       </CardContent>
     </Card>
   );
