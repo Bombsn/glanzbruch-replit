@@ -7,7 +7,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useState } from "react";
-import type { Product, Course } from "@shared/schema";
+import type { Product, CourseType } from "@shared/schema";
 
 const Home = () => {
   const { toast } = useToast();
@@ -18,8 +18,8 @@ const Home = () => {
     queryKey: ["/api/products/random", 4],
   });
 
-  const { data: courses = [] } = useQuery<Course[]>({
-    queryKey: ["/api/courses"],
+  const { data: courseTypes = [] } = useQuery<CourseType[]>({
+    queryKey: ["/api/course-types"],
   });
 
   const newsletterMutation = useMutation({
@@ -47,7 +47,7 @@ const Home = () => {
   };
 
   const featuredProducts = products;
-  const featuredCourse = courses[0];
+  const featuredCourseType = courseTypes[0];
 
   return (
     <div className="min-h-screen">
@@ -185,14 +185,14 @@ const Home = () => {
       </section>
 
       {/* Courses Section */}
-      {featuredCourse && (
+      {featuredCourseType && (
         <section className="py-16 bg-white">
           <div className="container mx-auto px-4">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div>
                 <img 
-                  src={featuredCourse.imageUrl}
-                  alt={featuredCourse.name}
+                  src={featuredCourseType.imageUrl}
+                  alt={featuredCourseType.name}
                   className="rounded-xl shadow-lg w-full"
                 />
               </div>

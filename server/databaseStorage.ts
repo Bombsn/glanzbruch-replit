@@ -11,6 +11,7 @@ import {
   type InsertCourseBooking,
   type CommissionRequest,
   type InsertCommissionRequest,
+  type CourseWithType,
   products,
   courses,
   courseTypes,
@@ -259,11 +260,15 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(courses);
   }
 
-  async getCoursesWithTypes() {
-    return await db.select({
+  async getCoursesWithTypes(): Promise<CourseWithType[]> {
+    const result = await db.select({
       id: courses.id,
       courseTypeId: courses.courseTypeId,
+      title: courses.title,
       date: courses.date,
+      startTime: courses.startTime,
+      endTime: courses.endTime,
+      maxParticipants: courses.maxParticipants,
       availableSpots: courses.availableSpots,
       location: courses.location,
       instructor: courses.instructor,
@@ -286,6 +291,24 @@ export class DatabaseStorage implements IStorage {
     })
     .from(courses)
     .leftJoin(courseTypes, eq(courses.courseTypeId, courseTypes.id));
+
+    // Transform the result to match CourseWithType interface
+    return result.map(row => ({
+      id: row.id,
+      courseTypeId: row.courseTypeId,
+      title: row.title,
+      date: row.date,
+      startTime: row.startTime,
+      endTime: row.endTime,
+      maxParticipants: row.maxParticipants,
+      availableSpots: row.availableSpots,
+      location: row.location,
+      instructor: row.instructor,
+      status: row.status,
+      notes: row.notes,
+      createdAt: row.createdAt,
+      courseType: row.courseType!
+    }));
   }
 
   async getCourse(id: string): Promise<Course | undefined> {

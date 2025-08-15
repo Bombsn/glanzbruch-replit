@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Calendar, Clock, Users, Plus, Edit, Trash2, LogOut, Home } from "lucide-react";
+import { Calendar, Clock, Users, Plus, Edit, Trash2, LogOut, Home as HomeIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertCourseSchema, type CourseType, type CourseWithType, type InsertCourse } from "@shared/schema";
@@ -239,8 +239,8 @@ const AdminDashboard = () => {
     setLocation("/admin");
   };
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("de-DE", {
+  const formatDate = (date: Date | string) => {
+    return new Date(date).toLocaleDateString("de-DE", {
       weekday: "long",
       year: "numeric",
       month: "long",
@@ -272,7 +272,7 @@ const AdminDashboard = () => {
               variant="outline"
               className="border-gold text-gold hover:bg-gold hover:text-white"
             >
-              <Home className="w-4 h-4 mr-2" />
+              <HomeIcon className="w-4 h-4 mr-2" />
               Zur Homepage
             </Button>
             <Button
@@ -357,7 +357,7 @@ const AdminDashboard = () => {
                     <div>
                       <h3 className="font-semibold text-forest">{course.title}</h3>
                       <p className="text-sm text-charcoal/70">
-                        {formatDate(new Date(course.date))} • {course.startTime} - {course.endTime}
+                        {formatDate(course.date)} • {course.startTime} - {course.endTime}
                       </p>
                       <p className="text-sm text-charcoal/70">
                         {course.availableSpots} von {course.maxParticipants} Plätzen verfügbar
