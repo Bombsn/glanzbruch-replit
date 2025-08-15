@@ -41,12 +41,11 @@ const AdminDashboard = () => {
     enabled: isAuthenticated,
   });
 
-  const form = useForm<InsertCourse>({
-    resolver: zodResolver(insertCourseSchema),
+  const form = useForm({
     defaultValues: {
       courseTypeId: "",
       title: "",
-      date: new Date().toISOString().split('T')[0] + 'T09:00:00.000Z',
+      date: new Date().toISOString().split('T')[0],
       startTime: "09:00",
       endTime: "17:00",
       maxParticipants: 6,
@@ -95,8 +94,21 @@ const AdminDashboard = () => {
     },
   });
 
-  const onSubmit = (data: InsertCourse) => {
-    createCourseMutation.mutate(data);
+  const onSubmit = (data: any) => {
+    // Combine date and start time for the ISO string
+    const dateTimeString = `${data.date}T${data.startTime}:00.000Z`;
+    
+    const courseData = {
+      ...data,
+      date: dateTimeString,
+      maxParticipants: Number(data.maxParticipants),
+      availableSpots: Number(data.maxParticipants),
+    };
+    
+    delete courseData.startTime;
+    delete courseData.endTime;
+    
+    createCourseMutation.mutate(courseData);
   };
 
   const handleLogout = () => {
@@ -249,10 +261,8 @@ const AdminDashboard = () => {
                         <FormLabel>Datum</FormLabel>
                         <FormControl>
                           <Input 
-                            {...field} 
-                            type="datetime-local"
-                            value={field.value ? new Date(field.value).toISOString().slice(0, 16) : ''}
-                            onChange={(e) => field.onChange(new Date(e.target.value).toISOString())}
+                            type="date"
+                            {...field}
                           />
                         </FormControl>
                         <FormMessage />
@@ -267,7 +277,10 @@ const AdminDashboard = () => {
                       <FormItem>
                         <FormLabel>Startzeit</FormLabel>
                         <FormControl>
-                          <Input {...field} type="time" />
+                          <Input 
+                            type="time" 
+                            {...field}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
