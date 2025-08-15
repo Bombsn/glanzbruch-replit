@@ -194,10 +194,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Kurstyp, Titel und Datum sind erforderlich" });
       }
       
-      // Set availableSpots to maxParticipants by default
-      data.availableSpots = data.maxParticipants;
+      // Convert date string to Date object for database
+      const courseData = {
+        ...data,
+        date: new Date(data.date),
+        availableSpots: data.maxParticipants
+      };
       
-      const course = await storage.createCourse(data);
+      const course = await storage.createCourse(courseData);
       res.status(201).json(course);
     } catch (error) {
       console.error("Create course error:", error);
