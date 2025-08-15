@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Calendar, Clock, Users, Plus, Edit, Trash2, LogOut } from "lucide-react";
+import { Calendar, Clock, Users, Plus, Edit, Trash2, LogOut, Home } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertCourseSchema, type CourseType, type CourseWithType, type InsertCourse } from "@shared/schema";
@@ -143,14 +143,24 @@ const AdminDashboard = () => {
             </p>
           </div>
           
-          <Button
-            onClick={handleLogout}
-            variant="outline"
-            className="border-forest text-forest hover:bg-forest hover:text-white"
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            Abmelden
-          </Button>
+          <div className="flex gap-3">
+            <Button
+              onClick={() => window.open('/', '_blank')}
+              variant="outline"
+              className="border-gold text-gold hover:bg-gold hover:text-white"
+            >
+              <Home className="w-4 h-4 mr-2" />
+              Zur Homepage
+            </Button>
+            <Button
+              onClick={handleLogout}
+              variant="outline"
+              className="border-forest text-forest hover:bg-forest hover:text-white"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Abmelden
+            </Button>
+          </div>
         </div>
 
         {/* Stats Cards */}
