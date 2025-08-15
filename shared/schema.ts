@@ -35,12 +35,26 @@ export const courseTypes = pgTable("course_types", {
 export const courses = pgTable("courses", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   courseTypeId: varchar("course_type_id").references(() => courseTypes.id).notNull(),
+  title: text("title").notNull(), // e.g. "UV-Resin Ganztageskurs am 6. September"
   date: timestamp("date").notNull(),
+  startTime: text("start_time").notNull(), // e.g. "09:00"
+  endTime: text("end_time").notNull(), // e.g. "17:00"
+  maxParticipants: integer("max_participants").notNull(),
   availableSpots: integer("available_spots").notNull(),
   location: text("location"),
   instructor: text("instructor").default("Glanzbruch Atelier"),
   status: text("status").default("scheduled"), // scheduled, cancelled, completed
   notes: text("notes"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+export const admins = pgTable("admins", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  username: text("username").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
@@ -110,6 +124,11 @@ export const insertCommissionRequestSchema = createInsertSchema(commissionReques
   createdAt: true,
 });
 
+export const insertAdminSchema = createInsertSchema(admins).omit({
+  id: true,
+  createdAt: true,
+});
+
 export type InsertProduct = z.infer<typeof insertProductSchema>;
 export type Product = typeof products.$inferSelect;
 
@@ -128,8 +147,10 @@ export type CourseBooking = typeof courseBookings.$inferSelect;
 export type InsertCommissionRequest = z.infer<typeof insertCommissionRequestSchema>;
 export type CommissionRequest = typeof commissionRequests.$inferSelect;
 
+export type InsertAdmin = z.infer<typeof insertAdminSchema>;
+export type Admin = typeof admins.$inferSelect;
+
 // Extended types for course with course type information
 export interface CourseWithType extends Course {
   courseType: CourseType;
 }
-export type CommissionRequest = typeof commissionRequests.$inferSelect;

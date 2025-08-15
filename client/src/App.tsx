@@ -10,6 +10,8 @@ import Courses from "@/pages/courses";
 import Gallery from "@/pages/gallery";
 import About from "@/pages/about";
 import Contact from "@/pages/contact";
+import AdminLogin from "@/pages/admin-login";
+import AdminDashboard from "@/pages/admin-dashboard";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import ShoppingCart from "@/components/shopping-cart";
@@ -23,6 +25,8 @@ function Router() {
       <Route path="/galerie" component={Gallery} />
       <Route path="/ueber-mich" component={About} />
       <Route path="/kontakt" component={Contact} />
+      <Route path="/admin" component={AdminLogin} />
+      <Route path="/admin/dashboard" component={AdminDashboard} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -33,12 +37,24 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <div className="min-h-screen bg-cream text-charcoal">
-          <Header />
-          <main>
-            <Router />
-          </main>
-          <Footer />
-          <ShoppingCart />
+          <Switch>
+            <Route path="/admin">
+              {/* Admin routes without header/footer */}
+              <Router />
+            </Route>
+            <Route path="/admin/dashboard">
+              <Router />
+            </Route>
+            <Route>
+              {/* Regular routes with header/footer */}
+              <Header />
+              <main>
+                <Router />
+              </main>
+              <Footer />
+              <ShoppingCart />
+            </Route>
+          </Switch>
         </div>
         <Toaster />
       </TooltipProvider>

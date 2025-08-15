@@ -148,6 +148,78 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin endpoints
+  // Simple admin login
+  app.post("/api/admin/login", async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      
+      if (!username || !password) {
+        return res.status(400).json({ message: "Benutzername und Passwort sind erforderlich" });
+      }
+
+      // Check for default admin credentials
+      if (username === "glanzbruch" && password === "admin2025") {
+        // Create a simple token (in production, use JWT)
+        const token = require('crypto').randomBytes(32).toString('hex');
+        return res.json({ token, message: "Anmeldung erfolgreich" });
+      }
+
+      return res.status(401).json({ message: "Ungültiger Benutzername oder Passwort" });
+    } catch (error) {
+      console.error("Admin login error:", error);
+      res.status(500).json({ message: "Serverfehler" });
+    }
+  });
+
+  // Get courses with course types for admin dashboard
+  app.get("/api/admin/courses", async (req, res) => {
+    try {
+      const courses = await storage.getCoursesWithTypes();
+      res.json(courses);
+    } catch (error) {
+      console.error("Get admin courses error:", error);
+      res.status(500).json({ message: "Failed to fetch courses" });
+    }
+  });
+
+  // Create new course instance
+  app.post("/api/admin/courses", async (req, res) => {
+    try {
+      const data = req.body;
+      
+      // Validate required fields
+      if (!data.courseTypeId || !data.title || !data.date) {
+        return res.status(400).json({ message: "Kurstyp, Titel und Datum sind erforderlich" });
+      }
+      
+      // Set availableSpots to maxParticipants by default
+      data.availableSpots = data.maxParticipants;
+      
+      const course = await storage.createCourse(data);
+      res.status(201).json(course);
+    } catch (error) {
+      console.error("Create course error:", error);
+      res.status(500).json({ message: "Failed to create course" });
+    }
+  });
+
+  // Delete course
+  app.delete("/api/admin/courses/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const success = await storage.deleteCourse(id);
+      if (success) {
+        res.status(204).send();
+      } else {
+        res.status(404).json({ message: "Kurs nicht gefunden" });
+      }
+    } catch (error) {
+      console.error("Delete course error:", error);
+      res.status(500).json({ message: "Failed to delete course" });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

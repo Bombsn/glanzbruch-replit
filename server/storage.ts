@@ -10,7 +10,10 @@ import {
   type CourseBooking,
   type InsertCourseBooking,
   type CommissionRequest,
-  type InsertCommissionRequest
+  type InsertCommissionRequest,
+  type Admin,
+  type InsertAdmin,
+  type CourseWithType,
 } from "@shared/schema";
 import { DatabaseStorage } from "./databaseStorage";
 
@@ -46,6 +49,14 @@ export interface IStorage {
   getCommissionRequests(): Promise<CommissionRequest[]>;
   getCommissionRequest(id: string): Promise<CommissionRequest | undefined>;
   createCommissionRequest(request: InsertCommissionRequest): Promise<CommissionRequest>;
+  
+  // Courses with types for admin dashboard
+  getCoursesWithTypes(): Promise<CourseWithType[]>;
+  deleteCourse(id: string): Promise<boolean>;
+  
+  // Admin methods
+  getAdminByUsername(username: string): Promise<Admin | undefined>;
+  createAdmin(admin: InsertAdmin): Promise<Admin>;
 }
 
 // Use database storage

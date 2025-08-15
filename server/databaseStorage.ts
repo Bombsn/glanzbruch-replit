@@ -16,7 +16,8 @@ import {
   courseTypes,
   orders,
   courseBookings,
-  commissionRequests
+  commissionRequests,
+  admins
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -336,5 +337,22 @@ export class DatabaseStorage implements IStorage {
   async createCommissionRequest(request: InsertCommissionRequest): Promise<CommissionRequest> {
     const [newRequest] = await db.insert(commissionRequests).values(request).returning();
     return newRequest;
+  }
+  
+  // Delete course method for admin
+  async deleteCourse(id: string): Promise<boolean> {
+    const result = await db.delete(courses).where(eq(courses.id, id));
+    return result.rowCount !== null && result.rowCount > 0;
+  }
+  
+  // Admin methods
+  async getAdminByUsername(username: string): Promise<any> {
+    const [admin] = await db.select().from(admins).where(eq(admins.username, username));
+    return admin || undefined;
+  }
+  
+  async createAdmin(admin: any): Promise<any> {
+    const [createdAdmin] = await db.insert(admins).values(admin).returning();
+    return createdAdmin;
   }
 }
