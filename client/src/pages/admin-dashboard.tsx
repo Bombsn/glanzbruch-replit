@@ -21,6 +21,7 @@ const AdminDashboard = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [editingCourse, setEditingCourse] = useState<CourseWithType | null>(null);
   const [courseToDelete, setCourseToDelete] = useState<CourseWithType | null>(null);
+  const [creatingCourse, setCreatingCourse] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -89,6 +90,7 @@ const AdminDashboard = () => {
         description: "Der neue Kurstermin wurde erfolgreich erstellt.",
       });
       form.reset();
+      setCreatingCourse(false);
       queryClient.invalidateQueries({ queryKey: ["/api/admin/courses"] });
     },
     onError: () => {
@@ -141,6 +143,7 @@ const AdminDashboard = () => {
 
   // Get booking count for a specific course
   const getBookingCount = (courseId: string) => {
+    if (!Array.isArray(courseBookings)) return 0;
     return courseBookings.filter((booking: any) => booking.courseId === courseId).length;
   };
 
@@ -210,6 +213,25 @@ const AdminDashboard = () => {
     });
     
     setEditingCourse(course);
+  };
+
+  const handleCreateCourse = () => {
+    // Reset form with default values
+    form.reset({
+      courseTypeId: "",
+      title: "",
+      date: "",
+      startTime: "10:00",
+      endTime: "17:00",
+      maxParticipants: 6,
+      availableSpots: 6,
+      location: "Glanzbruch Atelier",
+      instructor: "Glanzbruch Atelier",
+      status: "scheduled",
+      notes: "",
+    });
+    
+    setCreatingCourse(true);
   };
 
   const handleLogout = () => {
@@ -307,181 +329,17 @@ const AdminDashboard = () => {
           </Card>
         </div>
 
-        {/* Add New Course */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle className="flex items-center">
-              <Plus className="w-5 h-5 mr-2" />
-              Neuen Kurstermin erstellen
-            </CardTitle>
-          </CardHeader>
-          
-          <CardContent>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="courseTypeId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Kurstyp</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value}>
-                          <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Kurstyp auswählen" />
-                            </SelectTrigger>
-                          </FormControl>
-                          <SelectContent>
-                            {courseTypes.map((courseType) => (
-                              <SelectItem key={courseType.id} value={courseType.id}>
-                                {courseType.name}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="title"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Kurstitel</FormLabel>
-                        <FormControl>
-                          <Input 
-                            {...field} 
-                            placeholder="z.B. UV-Resin Ganztageskurs am 6. September"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="date"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Datum</FormLabel>
-                        <FormControl>
-                          <Input 
-                            type="date"
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="startTime"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Startzeit</FormLabel>
-                        <FormControl>
-                          <Input 
-                            type="time" 
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="endTime"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Endzeit</FormLabel>
-                        <FormControl>
-                          <Input {...field} type="time" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="maxParticipants"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Max. Teilnehmer</FormLabel>
-                        <FormControl>
-                          <Input 
-                            {...field} 
-                            type="number" 
-                            min="1"
-                            onChange={(e) => field.onChange(parseInt(e.target.value))}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="location"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Ort</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Glanzbruch Atelier" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                
-                <FormField
-                  control={form.control}
-                  name="notes"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Notizen (optional)</FormLabel>
-                      <FormControl>
-                        <Textarea 
-                          {...field} 
-                          placeholder="Besondere Hinweise für diesen Kurstermin..."
-                          value={field.value || ""}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <Button 
-                  type="submit" 
-                  className="bg-forest hover:bg-forest/90 text-white"
-                  disabled={createCourseMutation.isPending}
-                >
-                  {createCourseMutation.isPending ? "Wird erstellt..." : "Kurstermin erstellen"}
-                </Button>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
-
         {/* Existing Courses */}
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Aktuelle Kurstermine</CardTitle>
+            <Button
+              onClick={handleCreateCourse}
+              className="bg-forest hover:bg-forest/90 text-white"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Neuen Kurs erstellen
+            </Button>
           </CardHeader>
           
           <CardContent>
@@ -499,7 +357,7 @@ const AdminDashboard = () => {
                     <div>
                       <h3 className="font-semibold text-forest">{course.title}</h3>
                       <p className="text-sm text-charcoal/70">
-                        {formatDate(course.date)} • {course.startTime} - {course.endTime}
+                        {formatDate(new Date(course.date))} • {course.startTime} - {course.endTime}
                       </p>
                       <p className="text-sm text-charcoal/70">
                         {course.availableSpots} von {course.maxParticipants} Plätzen verfügbar
@@ -763,6 +621,213 @@ const AdminDashboard = () => {
                     type="button" 
                     variant="outline"
                     onClick={() => setEditingCourse(null)}
+                  >
+                    Abbrechen
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Create Course Modal */}
+        <Dialog open={creatingCourse} onOpenChange={(open) => !open && setCreatingCourse(false)}>
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Neuen Kurs erstellen</DialogTitle>
+            </DialogHeader>
+            
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="courseTypeId"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Kurstyp</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Wählen Sie einen Kurstyp" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {courseTypes.map((type) => (
+                              <SelectItem key={type.id} value={type.id}>
+                                {type.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="title"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Kurstitel</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="z.B. UV-Resin Ganztageskurs am 6. September" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="date"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Datum</FormLabel>
+                        <FormControl>
+                          <Input type="date" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="startTime"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Startzeit</FormLabel>
+                        <FormControl>
+                          <Input type="time" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="endTime"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Endzeit</FormLabel>
+                        <FormControl>
+                          <Input type="time" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="maxParticipants"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Max. Teilnehmer</FormLabel>
+                        <FormControl>
+                          <Input 
+                            {...field} 
+                            type="number" 
+                            min="1"
+                            onChange={(e) => field.onChange(parseInt(e.target.value))}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="location"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Ort</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="z.B. Glanzbruch Atelier" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="instructor"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Kursleiter</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="z.B. Glanzbruch Atelier" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
+                    name="status"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Status</FormLabel>
+                        <Select onValueChange={field.onChange} value={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="scheduled">Geplant</SelectItem>
+                            <SelectItem value="cancelled">Abgesagt</SelectItem>
+                            <SelectItem value="completed">Abgeschlossen</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                
+                <FormField
+                  control={form.control}
+                  name="notes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Notizen (optional)</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          {...field} 
+                          placeholder="Besondere Hinweise für diesen Kurstermin..."
+                          value={field.value || ""}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <div className="flex gap-3">
+                  <Button 
+                    type="submit" 
+                    className="bg-forest hover:bg-forest/90 text-white"
+                    disabled={createCourseMutation.isPending}
+                  >
+                    {createCourseMutation.isPending ? "Wird erstellt..." : "Kurstermin erstellen"}
+                  </Button>
+                  <Button 
+                    type="button" 
+                    variant="outline"
+                    onClick={() => setCreatingCourse(false)}
                   >
                     Abbrechen
                   </Button>
