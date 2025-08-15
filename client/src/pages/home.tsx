@@ -15,7 +15,7 @@ const Home = () => {
   const [email, setEmail] = useState("");
 
   const { data: products = [] } = useQuery<Product[]>({
-    queryKey: ["/api/products"],
+    queryKey: ["/api/products/random", 4],
   });
 
   const { data: courses = [] } = useQuery<Course[]>({
@@ -46,7 +46,7 @@ const Home = () => {
     newsletterMutation.mutate(email);
   };
 
-  const featuredProducts = products.slice(0, 4);
+  const featuredProducts = products;
   const featuredCourse = courses[0];
 
   return (
@@ -155,7 +155,7 @@ const Home = () => {
                 <div className="group cursor-pointer">
                   <Card className="bg-white rounded-xl overflow-hidden shadow-lg group-hover:shadow-xl transition-all duration-300 transform group-hover:-translate-y-2">
                     <img
-                      src={product.imageUrl}
+                      src={product.imageUrls[0]}
                       alt={product.name}
                       className="w-full h-48 object-cover"
                       data-testid={`featured-product-${product.id}`}
@@ -192,7 +192,7 @@ const Home = () => {
               <div>
                 <img 
                   src={featuredCourse.imageUrl}
-                  alt={featuredCourse.title}
+                  alt={featuredCourse.name}
                   className="rounded-xl shadow-lg w-full"
                 />
               </div>

@@ -20,7 +20,7 @@ import {
   admins
 } from "@shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import type { IStorage } from "./storage";
 
 export class DatabaseStorage implements IStorage {
@@ -219,6 +219,10 @@ export class DatabaseStorage implements IStorage {
   // Products
   async getProducts(): Promise<Product[]> {
     return await db.select().from(products);
+  }
+
+  async getRandomProducts(count: number): Promise<Product[]> {
+    return await db.select().from(products).orderBy(sql`RANDOM()`).limit(count);
   }
 
   async getProduct(id: string): Promise<Product | undefined> {

@@ -20,6 +20,7 @@ import { DatabaseStorage } from "./databaseStorage";
 export interface IStorage {
   // Products
   getProducts(): Promise<Product[]>;
+  getRandomProducts(count: number): Promise<Product[]>;
   getProduct(id: string): Promise<Product | undefined>;
   getProductsByCategory(category: string): Promise<Product[]>;
   createProduct(product: InsertProduct): Promise<Product>;

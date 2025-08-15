@@ -21,6 +21,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  app.get("/api/products/random/:count", async (req, res) => {
+    try {
+      const count = parseInt(req.params.count);
+      if (isNaN(count) || count <= 0) {
+        return res.status(400).json({ message: "Invalid count parameter" });
+      }
+      const products = await storage.getRandomProducts(count);
+      res.json(products);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch random products" });
+    }
+  });
+
   app.get("/api/products/category/:category", async (req, res) => {
     try {
       const { category } = req.params;
