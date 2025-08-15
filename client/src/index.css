@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&family=Dancing+Script:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -37,9 +37,8 @@
   --cream: hsl(45, 31%, 97%);
   --charcoal: hsl(0, 0%, 20%);
   
-  --font-playfair: 'Playfair Display', serif;
-  --font-inter: 'Inter', sans-serif;
-  --font-dancing: 'Dancing Script', cursive;
+  --font-heading: 'Poppins', sans-serif;
+  --font-body: 'Inter', sans-serif;
   --radius: 0.75rem;
 }
 
@@ -79,25 +78,21 @@
 
   body {
     @apply font-sans antialiased bg-background text-foreground;
-    font-family: var(--font-inter);
+    font-family: var(--font-body);
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-playfair);
+    font-family: var(--font-heading);
   }
 }
 
 @layer utilities {
-  .font-playfair {
-    font-family: var(--font-playfair);
+  .font-heading {
+    font-family: var(--font-heading);
   }
   
-  .font-inter {
-    font-family: var(--font-inter);
-  }
-  
-  .font-dancing {
-    font-family: var(--font-dancing);
+  .font-body {
+    font-family: var(--font-body);
   }
   
   .text-forest {

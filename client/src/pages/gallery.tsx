@@ -91,7 +91,7 @@ const Gallery = () => {
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="font-playfair text-4xl md:text-5xl font-bold text-forest mb-4" data-testid="heading-gallery">
+          <h1 className="font-heading text-4xl md:text-5xl font-bold text-forest mb-4" data-testid="heading-gallery">
             Bildergalerie
           </h1>
           <p className="text-lg text-charcoal max-w-3xl mx-auto">
@@ -171,7 +171,7 @@ const Gallery = () => {
                 </div>
                 
                 <CardContent className="p-4">
-                  <h3 className="font-playfair text-lg font-semibold text-forest mb-2" data-testid={`image-title-${image.id}`}>
+                  <h3 className="font-heading text-lg font-semibold text-forest mb-2" data-testid={`image-title-${image.id}`}>
                     {image.title}
                   </h3>
                   <p className="text-sm text-charcoal/70" data-testid={`image-description-${image.id}`}>
@@ -200,7 +200,7 @@ const Gallery = () => {
         {/* Call to Action */}
         <div className="mt-16 text-center bg-sage/10 rounded-xl p-8">
           <Heart className="w-12 h-12 text-gold mx-auto mb-4" />
-          <h3 className="font-playfair text-2xl font-bold text-forest mb-4">
+          <h3 className="font-heading text-2xl font-bold text-forest mb-4">
             Haben Sie ein Lieblingsstück entdeckt?
           </h3>
           <p className="text-charcoal mb-6 max-w-2xl mx-auto">

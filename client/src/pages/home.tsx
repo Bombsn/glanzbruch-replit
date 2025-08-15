@@ -72,8 +72,8 @@ const Home = () => {
             />
           </div>
           
-          <h1 className="font-playfair text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-            <span className="font-dancing text-gold block text-2xl md:text-3xl mb-2">Glanzbruch</span>
+          <h1 className="font-heading text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+            <span className="font-heading text-gold block text-2xl md:text-3xl mb-2">Glanzbruch</span>
             Wald- und Wiesenschmuck
           </h1>
           
@@ -113,7 +113,7 @@ const Home = () => {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <h2 className="font-playfair text-3xl md:text-4xl font-bold text-forest mb-8" data-testid="heading-welcome">
+            <h2 className="font-heading text-3xl md:text-4xl font-bold text-forest mb-8" data-testid="heading-welcome">
               Willkommen bei Glanzbruch
             </h2>
             <div className="prose prose-lg mx-auto text-charcoal leading-relaxed">
@@ -127,7 +127,7 @@ const Home = () => {
                 <p className="font-semibold text-forest text-lg">
                   <strong>Mystisch, einzigartig und handgefertigt</strong> - Glanzbruch schafft Unikate, die dich als treue Begleiter im Alltag verzaubern.
                 </p>
-                <p className="font-dancing text-2xl text-gold mt-4">
+                <p className="font-heading text-2xl text-gold mt-4">
                   Finde dein ganz persönliches Stück Ewigkeit.
                 </p>
               </div>
@@ -140,7 +140,7 @@ const Home = () => {
       <section className="py-16 bg-cream">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="font-playfair text-3xl md:text-4xl font-bold text-forest mb-4" data-testid="heading-fairy-jewelry">
+            <h2 className="font-heading text-3xl md:text-4xl font-bold text-forest mb-4" data-testid="heading-fairy-jewelry">
               Märchenhafte Schmuck-Unikate
             </h2>
             <p className="text-lg text-charcoal max-w-3xl mx-auto">
@@ -161,7 +161,7 @@ const Home = () => {
                       data-testid={`featured-product-${product.id}`}
                     />
                     <CardContent className="p-6">
-                      <h3 className="font-playfair text-xl font-semibold text-forest mb-2">{product.name}</h3>
+                      <h3 className="font-heading text-xl font-semibold text-forest mb-2">{product.name}</h3>
                       <p className="text-charcoal/70 text-sm mb-4">Zarte Schmuckstücke mit eingefassten Naturschätzen</p>
                       <div className="flex items-center justify-between">
                         <span className="text-gold font-semibold">ab CHF {parseFloat(product.price).toFixed(2)}</span>
@@ -197,7 +197,7 @@ const Home = () => {
                 />
               </div>
               <div>
-                <h2 className="font-playfair text-3xl md:text-4xl font-bold text-forest mb-6" data-testid="heading-courses">
+                <h2 className="font-heading text-3xl md:text-4xl font-bold text-forest mb-6" data-testid="heading-courses">
                   Kreativkurse
                 </h2>
                 <p className="text-lg text-charcoal mb-6 leading-relaxed">
@@ -258,7 +258,7 @@ const Home = () => {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="font-playfair text-3xl md:text-4xl font-bold text-forest mb-6" data-testid="heading-memorial-jewelry">
+              <h2 className="font-heading text-3xl md:text-4xl font-bold text-forest mb-6" data-testid="heading-memorial-jewelry">
                 Einzigartige Andenken für die Ewigkeit
               </h2>
               <p className="text-lg text-charcoal mb-6 leading-relaxed">
@@ -270,7 +270,7 @@ const Home = () => {
               </p>
 
               <div className="bg-white rounded-lg p-6 mb-8 shadow-sm">
-                <h3 className="font-playfair text-xl font-semibold text-forest mb-4">So funktioniert's:</h3>
+                <h3 className="font-heading text-xl font-semibold text-forest mb-4">So funktioniert's:</h3>
                 <div className="space-y-3">
                   <div className="flex items-start space-x-3">
                     <div className="w-6 h-6 bg-gold text-white rounded-full flex items-center justify-center text-sm font-semibold mt-1">1</div>
@@ -313,7 +313,7 @@ const Home = () => {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="font-playfair text-3xl md:text-4xl font-bold text-forest mb-4" data-testid="heading-testimonials">
+            <h2 className="font-heading text-3xl md:text-4xl font-bold text-forest mb-4" data-testid="heading-testimonials">
               Was unsere Kunden sagen
             </h2>
             <p className="text-lg text-charcoal">Authentische Erfahrungen mit Glanzbruch-Schmuck</p>
@@ -375,7 +375,7 @@ const Home = () => {
       <section className="py-16 bg-gradient-to-r from-forest to-sage">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-2xl mx-auto">
-            <h2 className="font-playfair text-3xl md:text-4xl font-bold text-white mb-4" data-testid="heading-newsletter">
+            <h2 className="font-heading text-3xl md:text-4xl font-bold text-white mb-4" data-testid="heading-newsletter">
               Bleib in Verbindung
             </h2>
             <p className="text-cream mb-8 text-lg">

@@ -37,7 +37,7 @@ const Header = () => {
             <div className="w-10 h-10 bg-gradient-to-br from-forest to-sage rounded-full flex items-center justify-center">
               <Gem className="text-gold text-lg" />
             </div>
-            <span className="font-playfair text-2xl font-bold text-forest">Glanzbruch</span>
+            <span className="font-heading text-2xl font-bold text-forest">Glanzbruch</span>
           </Link>
 
           {/* Desktop Navigation */}

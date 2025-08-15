@@ -84,7 +84,7 @@ const Contact = () => {
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="font-playfair text-4xl md:text-5xl font-bold text-forest mb-4" data-testid="heading-contact">
+          <h1 className="font-heading text-4xl md:text-5xl font-bold text-forest mb-4" data-testid="heading-contact">
             Kontakt
           </h1>
           <p className="text-lg text-charcoal max-w-3xl mx-auto">
@@ -98,7 +98,7 @@ const Contact = () => {
           <div className="lg:col-span-1">
             <Card className="mb-6">
               <CardHeader>
-                <CardTitle className="font-playfair text-xl text-forest" data-testid="heading-contact-info">
+                <CardTitle className="font-heading text-xl text-forest" data-testid="heading-contact-info">
                   Kontakt-Informationen
                 </CardTitle>
               </CardHeader>
@@ -186,7 +186,7 @@ const Contact = () => {
             {activeForm === "general" && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="font-playfair text-xl text-forest">
+                  <CardTitle className="font-heading text-xl text-forest">
                     Allgemeine Anfrage
                   </CardTitle>
                 </CardHeader>
@@ -263,7 +263,7 @@ const Contact = () => {
             {activeForm === "commission" && (
               <Card>
                 <CardHeader>
-                  <CardTitle className="font-playfair text-xl text-forest">
+                  <CardTitle className="font-heading text-xl text-forest">
                     Sonderanfertigung anfragen
                   </CardTitle>
                   <p className="text-sm text-charcoal/70">
@@ -404,7 +404,7 @@ const Contact = () => {
         <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-8">
           <Card className="bg-white">
             <CardHeader>
-              <CardTitle className="font-playfair text-xl text-forest flex items-center">
+              <CardTitle className="font-heading text-xl text-forest flex items-center">
                 <Clock className="w-5 h-5 mr-2 text-sage" />
                 Antwortzeiten
               </CardTitle>
@@ -429,7 +429,7 @@ const Contact = () => {
 
           <Card className="bg-white">
             <CardHeader>
-              <CardTitle className="font-playfair text-xl text-forest flex items-center">
+              <CardTitle className="font-heading text-xl text-forest flex items-center">
                 <Heart className="w-5 h-5 mr-2 text-sage" />
                 Beratung vor Ort
               </CardTitle>

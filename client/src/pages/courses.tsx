@@ -26,7 +26,7 @@ const Courses = () => {
       <div className="container mx-auto px-4">
         {/* Hero Section */}
         <div className="text-center mb-16">
-          <h1 className="font-playfair text-4xl md:text-5xl font-bold text-forest mb-6" data-testid="heading-courses">
+          <h1 className="font-heading text-4xl md:text-5xl font-bold text-forest mb-6" data-testid="heading-courses">
             Kreativkurse mit UV-Resin
           </h1>
           <p className="text-xl text-charcoal max-w-4xl mx-auto mb-8 leading-relaxed">
@@ -57,7 +57,7 @@ const Courses = () => {
 
         {/* Course Info Section */}
         <div className="bg-white rounded-xl p-8 mb-16 shadow-sm">
-          <h2 className="font-playfair text-3xl font-bold text-forest mb-6" data-testid="heading-what-you-learn">
+          <h2 className="font-heading text-3xl font-bold text-forest mb-6" data-testid="heading-what-you-learn">
             Was Sie in den Kursen lernen
           </h2>
           
@@ -110,7 +110,7 @@ const Courses = () => {
 
         {/* Available Courses */}
         <div className="mb-16">
-          <h2 className="font-playfair text-3xl font-bold text-forest mb-8 text-center" data-testid="heading-available-courses">
+          <h2 className="font-heading text-3xl font-bold text-forest mb-8 text-center" data-testid="heading-available-courses">
             Verfügbare Kurse
           </h2>
           
@@ -134,7 +134,7 @@ const Courses = () => {
 
         {/* Workshop Information */}
         <div className="bg-sage/10 rounded-xl p-8">
-          <h2 className="font-playfair text-3xl font-bold text-forest mb-6 text-center" data-testid="heading-workshop-info">
+          <h2 className="font-heading text-3xl font-bold text-forest mb-6 text-center" data-testid="heading-workshop-info">
             Informationen zu den Workshops
           </h2>
           

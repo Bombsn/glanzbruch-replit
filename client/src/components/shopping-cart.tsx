@@ -34,7 +34,7 @@ const ShoppingCart = () => {
     <Sheet open={isOpen} onOpenChange={toggleCart}>
       <SheetContent className="w-[400px] sm:w-[540px]">
         <SheetHeader>
-          <SheetTitle className="font-playfair text-xl text-forest">Warenkorb</SheetTitle>
+          <SheetTitle className="font-heading text-xl text-forest">Warenkorb</SheetTitle>
         </SheetHeader>
 
         <div className="flex flex-col h-full">

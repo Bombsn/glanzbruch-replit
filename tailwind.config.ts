@@ -69,12 +69,11 @@ export default {
         charcoal: "var(--charcoal)",
       },
       fontFamily: {
-        sans: ["var(--font-inter)"],
-        serif: ["var(--font-serif)"],
+        sans: ["var(--font-body)"],
+        serif: ["var(--font-body)"],
         mono: ["var(--font-mono)"],
-        playfair: ["var(--font-playfair)"],
-        inter: ["var(--font-inter)"],
-        dancing: ["var(--font-dancing)"],
+        heading: ["var(--font-heading)"],
+        body: ["var(--font-body)"],
       },
       keyframes: {
         "accordion-down": {

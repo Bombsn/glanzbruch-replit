@@ -7,7 +7,7 @@ const About = () => {
       <div className="container mx-auto px-4">
         {/* Hero Section */}
         <div className="text-center mb-16">
-          <h1 className="font-playfair text-4xl md:text-5xl font-bold text-forest mb-6" data-testid="heading-about">
+          <h1 className="font-heading text-4xl md:text-5xl font-bold text-forest mb-6" data-testid="heading-about">
             Über mich
           </h1>
           <p className="text-xl text-charcoal max-w-3xl mx-auto leading-relaxed">
@@ -27,7 +27,7 @@ const About = () => {
             />
           </div>
           <div>
-            <h2 className="font-playfair text-3xl font-bold text-forest mb-6" data-testid="heading-my-story">
+            <h2 className="font-heading text-3xl font-bold text-forest mb-6" data-testid="heading-my-story">
               Meine Geschichte
             </h2>
             <div className="space-y-4 text-charcoal leading-relaxed">
@@ -52,7 +52,7 @@ const About = () => {
 
         {/* Philosophy Section */}
         <div className="bg-white rounded-xl p-8 mb-16 shadow-sm">
-          <h2 className="font-playfair text-3xl font-bold text-forest mb-8 text-center" data-testid="heading-philosophy">
+          <h2 className="font-heading text-3xl font-bold text-forest mb-8 text-center" data-testid="heading-philosophy">
             Meine Philosophie
           </h2>
           
@@ -95,7 +95,7 @@ const About = () => {
         {/* Skills & Experience */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
           <div>
-            <h2 className="font-playfair text-3xl font-bold text-forest mb-6" data-testid="heading-skills">
+            <h2 className="font-heading text-3xl font-bold text-forest mb-6" data-testid="heading-skills">
               Mein Handwerk
             </h2>
             
@@ -142,7 +142,7 @@ const About = () => {
           </div>
           
           <div>
-            <h2 className="font-playfair text-3xl font-bold text-forest mb-6" data-testid="heading-experience">
+            <h2 className="font-heading text-3xl font-bold text-forest mb-6" data-testid="heading-experience">
               Erfahrung & Werte
             </h2>
             
@@ -191,7 +191,7 @@ const About = () => {
 
         {/* Workshop Section */}
         <div className="bg-forest/5 rounded-xl p-8 text-center">
-          <h2 className="font-playfair text-3xl font-bold text-forest mb-6" data-testid="heading-workshop">
+          <h2 className="font-heading text-3xl font-bold text-forest mb-6" data-testid="heading-workshop">
             Mein Atelier
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
@@ -224,7 +224,7 @@ const About = () => {
         {/* Personal Touch */}
         <div className="mt-16 text-center bg-white rounded-xl p-8 shadow-sm">
           <div className="max-w-3xl mx-auto">
-            <h2 className="font-playfair text-2xl font-bold text-forest mb-4" data-testid="heading-personal-message">
+            <h2 className="font-heading text-2xl font-bold text-forest mb-4" data-testid="heading-personal-message">
               Eine persönliche Nachricht
             </h2>
             <p className="text-charcoal italic mb-4 text-lg leading-relaxed">
@@ -232,7 +232,7 @@ const About = () => {
               Es ist meine Mission, Ihnen nicht nur ein schönes Accessoire zu schaffen, sondern 
               ein Stück Ewigkeit, das Ihre besonderen Momente und Erinnerungen für immer bewahrt."
             </p>
-            <p className="font-dancing text-2xl text-gold">
+            <p className="font-heading text-2xl text-gold">
               Mit herzlichen Grüßen aus dem Atelier
             </p>
           </div>

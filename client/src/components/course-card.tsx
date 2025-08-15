@@ -87,7 +87,7 @@ const CourseCard = ({ course }: CourseCardProps) => {
       </div>
       
       <CardContent className="p-6">
-        <h3 className="font-playfair text-xl font-semibold text-forest mb-3" data-testid={`course-title-${course.id}`}>
+        <h3 className="font-heading text-xl font-semibold text-forest mb-3" data-testid={`course-title-${course.id}`}>
           {course.title}
         </h3>
         
@@ -125,7 +125,7 @@ const CourseCard = ({ course }: CourseCardProps) => {
           </DialogTrigger>
           <DialogContent className="sm:max-w-[425px]">
             <DialogHeader>
-              <DialogTitle className="font-playfair text-xl text-forest">
+              <DialogTitle className="font-heading text-xl text-forest">
                 Kurs buchen: {course.title}
               </DialogTitle>
             </DialogHeader>

@@ -13,7 +13,7 @@ const Footer = () => {
               <div className="w-8 h-8 bg-gradient-to-br from-gold to-sage rounded-full flex items-center justify-center">
                 <Gem className="text-white w-4 h-4" />
               </div>
-              <span className="font-playfair text-xl font-bold">Glanzbruch</span>
+              <span className="font-heading text-xl font-bold">Glanzbruch</span>
             </div>
             <p className="text-gray-300 text-sm leading-relaxed">
               Zauberhafte Schmuckstücke aus der Natur. Handgefertigt mit Liebe und Sorgfalt in der Schweiz.

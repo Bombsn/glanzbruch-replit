@@ -83,7 +83,7 @@ const Shop = () => {
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="font-playfair text-4xl md:text-5xl font-bold text-forest mb-4" data-testid="heading-shop">
+          <h1 className="font-heading text-4xl md:text-5xl font-bold text-forest mb-4" data-testid="heading-shop">
             Unser Schmuck-Sortiment
           </h1>
           <p className="text-lg text-charcoal max-w-3xl mx-auto">
@@ -157,7 +157,7 @@ const Shop = () => {
 
         {/* Call to Action */}
         <div className="mt-16 text-center bg-white rounded-xl p-8 shadow-sm">
-          <h3 className="font-playfair text-2xl font-bold text-forest mb-4">
+          <h3 className="font-heading text-2xl font-bold text-forest mb-4">
             Nicht das Richtige gefunden?
           </h3>
           <p className="text-charcoal mb-6 max-w-2xl mx-auto">

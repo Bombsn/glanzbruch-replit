@@ -67,7 +67,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           </span>
         </div>
         
-        <h3 className="font-playfair text-xl font-semibold text-forest mb-2" data-testid={`product-name-${product.id}`}>
+        <h3 className="font-heading text-xl font-semibold text-forest mb-2" data-testid={`product-name-${product.id}`}>
           {product.name}
         </h3>
         
