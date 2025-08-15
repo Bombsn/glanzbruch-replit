@@ -194,10 +194,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Kurstyp, Titel und Datum sind erforderlich" });
       }
       
-      // Convert date string to Date object for database
+      // Convert date string to Date object and set start/end times
       const courseData = {
         ...data,
         date: new Date(data.date),
+        startTime: data.startTime || '09:00',
+        endTime: data.endTime || '17:00',
         availableSpots: data.maxParticipants
       };
       
