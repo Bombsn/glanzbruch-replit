@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import crypto from "crypto";
 import { 
   insertProductSchema,
   insertCourseSchema,
@@ -161,7 +162,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check for default admin credentials
       if (username === "glanzbruch" && password === "admin2025") {
         // Create a simple token (in production, use JWT)
-        const token = require('crypto').randomBytes(32).toString('hex');
+        const token = crypto.randomBytes(32).toString('hex');
         return res.json({ token, message: "Anmeldung erfolgreich" });
       }
 
