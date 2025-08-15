@@ -71,9 +71,40 @@ const ProductCard = ({ product }: ProductCardProps) => {
           {product.name}
         </h3>
         
-        <p className="text-charcoal/70 text-sm mb-4 flex-1" data-testid={`product-description-${product.id}`}>
-          {product.description}
-        </p>
+        {/* Product Info instead of description */}
+        <div className="mb-4 flex-1">
+          <div className="space-y-2">
+            {product.material && (
+              <div className="flex items-center text-xs text-charcoal/70">
+                <span className="font-medium text-forest mr-2">Material:</span>
+                <span>{product.material}</span>
+              </div>
+            )}
+            {product.dimensions && (
+              <div className="flex items-center text-xs text-charcoal/70">
+                <span className="font-medium text-forest mr-2">Größe:</span>
+                <span>{product.dimensions}</span>
+              </div>
+            )}
+            {product.weight && (
+              <div className="flex items-center text-xs text-charcoal/70">
+                <span className="font-medium text-forest mr-2">Gewicht:</span>
+                <span>{product.weight}</span>
+              </div>
+            )}
+            {product.sku && (
+              <div className="flex items-center text-xs text-charcoal/70">
+                <span className="font-medium text-forest mr-2">Art.-Nr.:</span>
+                <span>{product.sku}</span>
+              </div>
+            )}
+          </div>
+          {(!product.material && !product.dimensions && !product.weight && !product.sku) && (
+            <p className="text-charcoal/50 text-xs italic">
+              Handgefertigtes Unikat
+            </p>
+          )}
+        </div>
         
         {/* Footer section - always at bottom */}
         <div className="mt-auto">
