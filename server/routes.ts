@@ -114,14 +114,54 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Object Storage Routes
+  // Object Storage Routes - Real implementation
   app.post("/api/objects/upload", async (req, res) => {
     try {
-      // This would be replaced with actual object storage service
-      const uploadURL = `https://example.com/upload/${Date.now()}`;
+      const privateObjectDir = process.env.PRIVATE_OBJECT_DIR;
+      if (!privateObjectDir) {
+        return res.status(500).json({ message: "PRIVATE_OBJECT_DIR not set" });
+      }
+
+      const objectId = crypto.randomUUID();
+      let fullPath = `${privateObjectDir}/gallery/${objectId}`;
+      
+      if (!fullPath.startsWith("/")) {
+        fullPath = `/${fullPath}`;
+      }
+      const pathParts = fullPath.split("/");
+      if (pathParts.length < 3) {
+        return res.status(500).json({ message: "Invalid path structure" });
+      }
+      const bucketName = pathParts[1];
+      const objectName = pathParts.slice(2).join("/");
+      
+      // Direct sidecar call
+      const request = {
+        bucket_name: bucketName,
+        object_name: objectName,
+        method: "PUT",
+        expires_at: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
+      };
+      
+      const response = await fetch(
+        "http://127.0.0.1:1106/object-storage/signed-object-url",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(request),
+        }
+      );
+      
+      if (!response.ok) {
+        const errorText = await response.text();
+        return res.status(500).json({ message: "Failed to get signed URL", error: errorText });
+      }
+      
+      const { signed_url: uploadURL } = await response.json();
       res.json({ uploadURL });
     } catch (error) {
-      res.status(500).json({ message: "Failed to get upload URL" });
+      console.error("Failed to get upload URL:", error);
+      res.status(500).json({ message: "Failed to get upload URL", error: (error as Error).message });
     }
   });
 
@@ -530,17 +570,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Object Storage Routes for Gallery Images
-  app.post("/api/objects/upload", async (req, res) => {
+  // Test debug route to verify object storage
+  app.get("/api/debug/object-storage", async (req, res) => {
     try {
-      const objectStorageService = new ObjectStorageService();
-      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
-      res.json({ uploadURL });
+      const privateDir = process.env.PRIVATE_OBJECT_DIR;
+      const publicPaths = process.env.PUBLIC_OBJECT_SEARCH_PATHS;
+      
+      // Direct sidecar test
+      const future_date = new Date(Date.now() + 15 * 60 * 1000).toISOString();
+      const request = {
+        bucket_name: "replit-objstore-764ac426-f2e7-40ac-8c3c-7996aea383ec",
+        object_name: ".private/gallery/debug-test",
+        method: "PUT",
+        expires_at: future_date,
+      };
+      
+      const response = await fetch(
+        "http://127.0.0.1:1106/object-storage/signed-object-url",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(request),
+        }
+      );
+      
+      const responseText = await response.text();
+      
+      res.json({
+        env: { privateDir, publicPaths },
+        sidecar: { 
+          ok: response.ok, 
+          status: response.status,
+          response: responseText
+        }
+      });
     } catch (error) {
-      console.error("Failed to get upload URL:", error);
-      res.status(500).json({ message: "Failed to get upload URL" });
+      res.status(500).json({ error: error.message, stack: error.stack });
     }
   });
+
+
 
   // Serve objects from storage
   app.get("/objects/:objectPath(*)", async (req, res) => {
