@@ -95,87 +95,88 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
   };
 
   return (
-    <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col h-full">
-      <div className="relative">
-        <img
-          src={course.courseType.imageUrl}
-          alt={course.courseType.name}
-          className="w-full h-48 object-cover"
-          data-testid={`course-image-${course.id}`}
-        />
-        <div className="absolute top-4 left-4">
-          <Badge variant="secondary" className="bg-white/90 text-forest">
-            {course.availableSpots} Plätze verfügbar
-          </Badge>
-        </div>
-      </div>
-      
-      <CardContent className="p-6 flex flex-col flex-1">
-        <h3 className="font-heading text-xl font-semibold text-forest mb-3" data-testid={`course-title-${course.id}`}>
-          {course.title}
-        </h3>
-        
-        <p className="text-charcoal/70 text-sm mb-4 leading-relaxed flex-1" data-testid={`course-description-${course.id}`}>
-          {course.courseType.description}
-        </p>
-        
-        <div className="space-y-3 mb-6">
-          <div className="flex items-center text-sm text-charcoal">
-            <Calendar className="w-4 h-4 mr-2 text-gold" />
-            <span data-testid={`course-date-${course.id}`}>
-              {formatDate(course.date)}
-            </span>
+    <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
+      <div className="flex">
+        {/* Image Section */}
+        <div className="relative w-48 h-32 flex-shrink-0">
+          <img
+            src={course.courseType.imageUrl}
+            alt={course.courseType.name}
+            className="w-full h-full object-cover"
+            data-testid={`course-image-${course.id}`}
+          />
+          <div className="absolute top-2 left-2">
+            <Badge variant="secondary" className="bg-white/90 text-forest text-xs">
+              {course.availableSpots} Plätze verfügbar
+            </Badge>
           </div>
-          
-          <div className="flex items-center text-sm text-charcoal">
-            <Clock className="w-4 h-4 mr-2 text-gold" />
-            <span data-testid={`course-time-${course.id}`}>
-              {formatTime(course.startTime)} - {formatTime(course.endTime)}
-            </span>
-          </div>
-          
-          <div className="flex items-center text-sm text-charcoal">
-            <Users className="w-4 h-4 mr-2 text-gold" />
-            <span data-testid={`course-participants-${course.id}`}>
-              Max. {course.maxParticipants} Teilnehmer
-            </span>
-          </div>
-
-          {course.courseType.duration && (
-            <div className="flex items-center text-sm text-charcoal">
-              <Star className="w-4 h-4 mr-2 text-gold" />
-              <span data-testid={`course-duration-${course.id}`}>
-                {formatDuration(typeof course.courseType.duration === 'number' ? course.courseType.duration : 0)}
-              </span>
-            </div>
-          )}
-
-          {course.location && (
-            <div className="flex items-center text-sm text-charcoal">
-              <MapPin className="w-4 h-4 mr-2 text-gold" />
-              <span data-testid={`course-location-${course.id}`}>
-                {course.location}
-              </span>
-            </div>
-          )}
         </div>
         
-        <div className="flex items-center justify-between pt-4 border-t border-sage/20">
+        {/* Content Section */}
+        <CardContent className="p-4 flex-1 flex flex-col justify-between">
           <div>
-            <p className="text-2xl font-bold text-forest" data-testid={`course-price-${course.id}`}>
-              {formatPrice(course.courseType.price)}
-            </p>
+            <h3 className="font-heading text-lg font-semibold text-forest mb-3" data-testid={`course-title-${course.id}`}>
+              {course.title}
+            </h3>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-charcoal">
+              <div className="flex items-center">
+                <Calendar className="w-4 h-4 mr-2 text-gold" />
+                <span data-testid={`course-date-${course.id}`}>
+                  {formatDate(course.date)}
+                </span>
+              </div>
+              
+              <div className="flex items-center">
+                <Clock className="w-4 h-4 mr-2 text-gold" />
+                <span data-testid={`course-time-${course.id}`}>
+                  {formatTime(course.startTime)} - {formatTime(course.endTime)}
+                </span>
+              </div>
+              
+              <div className="flex items-center">
+                <Users className="w-4 h-4 mr-2 text-gold" />
+                <span data-testid={`course-participants-${course.id}`}>
+                  Max. {course.maxParticipants} Teilnehmer
+                </span>
+              </div>
+
+              {course.courseType.duration && (
+                <div className="flex items-center">
+                  <Star className="w-4 h-4 mr-2 text-gold" />
+                  <span data-testid={`course-duration-${course.id}`}>
+                    {formatDuration(typeof course.courseType.duration === 'number' ? course.courseType.duration : 0)}
+                  </span>
+                </div>
+              )}
+
+              {course.location && (
+                <div className="flex items-center md:col-span-2">
+                  <MapPin className="w-4 h-4 mr-2 text-gold" />
+                  <span data-testid={`course-location-${course.id}`}>
+                    {course.location}
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
           
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button 
-                className="bg-gold hover:bg-gold/90 text-white"
-                data-testid={`button-book-course-${course.id}`}
-              >
-                Jetzt buchen
-              </Button>
-            </DialogTrigger>
+          <div className="flex items-center justify-between pt-3 mt-3 border-t border-sage/20">
+            <div>
+              <p className="text-xl font-bold text-forest" data-testid={`course-price-${course.id}`}>
+                {formatPrice(course.courseType.price)}
+              </p>
+            </div>
+            
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button 
+                  className="bg-gold hover:bg-gold/90 text-white"
+                  data-testid={`button-book-course-${course.id}`}
+                >
+                  Jetzt buchen
+                </Button>
+              </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
                 <DialogTitle className="text-forest">Kurs buchen</DialogTitle>
@@ -282,8 +283,9 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
               </Form>
             </DialogContent>
           </Dialog>
-        </div>
-      </CardContent>
+          </div>
+        </CardContent>
+      </div>
     </Card>
   );
 };
