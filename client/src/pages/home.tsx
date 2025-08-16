@@ -67,15 +67,13 @@ const Home = () => {
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <div
-          className="absolute inset-0"
+          className="absolute inset-0 bg-gradient-to-br from-forest/70 to-sage/50"
           style={{
             backgroundImage: `url(${heroBackgroundImage})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
-            filter: "brightness(0.7) contrast(1.4) saturate(1.1) blur(2px)",
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-br from-black/50 via-black/30 to-black/40" />
 
         <div className="relative z-10 text-center max-w-4xl mx-auto px-4">
           <h1 className="font-logo md:text-6xl lg:text-7xl text-white mb-6 text-[94px]">
