@@ -48,7 +48,10 @@ import { Link } from "wouter";
 const AdminGallery = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editingImageId, setEditingImageId] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
   const [formData, setFormData] = useState({
     imageUrl: "",
     title: "",
@@ -132,13 +135,7 @@ const AdminGallery = () => {
       queryClient.invalidateQueries({ queryKey: ['/api/admin/gallery'] });
       queryClient.invalidateQueries({ queryKey: ['/api/gallery'] });
       setShowAddModal(false);
-      setFormData({
-        imageUrl: "",
-        title: "",
-        description: "",
-        category: "",
-        altText: "",
-      });
+      resetForm();
       toast({
         title: "Bild hinzugefügt",
         description: "Das Galeriebild wurde erfolgreich hinzugefügt.",
@@ -148,6 +145,38 @@ const AdminGallery = () => {
       toast({
         title: "Fehler",
         description: "Das Galeriebild konnte nicht hinzugefügt werden.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Edit image mutation
+  const editImageMutation = useMutation({
+    mutationFn: async (data: typeof formData) => {
+      if (!editingImageId) throw new Error("No image ID for editing");
+      await apiRequest(`/api/gallery/${editingImageId}`, "PUT", {
+        imageUrl: data.imageUrl,
+        title: data.title,
+        description: data.description || null,
+        category: data.category,
+        altText: data.altText,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/gallery'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/gallery'] });
+      setShowEditModal(false);
+      setEditingImageId(null);
+      resetForm();
+      toast({
+        title: "Bild aktualisiert",
+        description: "Das Galeriebild wurde erfolgreich aktualisiert.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Fehler",
+        description: "Das Galeriebild konnte nicht aktualisiert werden.",
         variant: "destructive",
       });
     },
@@ -170,6 +199,16 @@ const AdminGallery = () => {
     });
   };
 
+  const resetForm = () => {
+    setFormData({
+      imageUrl: "",
+      title: "",
+      description: "",
+      category: "",
+      altText: "",
+    });
+  };
+
   const handleAddImage = () => {
     if (!formData.imageUrl || !formData.title || !formData.category || !formData.altText) {
       toast({
@@ -180,6 +219,30 @@ const AdminGallery = () => {
       return;
     }
     addImageMutation.mutate(formData);
+  };
+
+  const handleEditImage = () => {
+    if (!formData.imageUrl || !formData.title || !formData.category || !formData.altText) {
+      toast({
+        title: "Fehlende Angaben",
+        description: "Bitte füllen Sie alle Pflichtfelder aus (Bild, Titel, Kategorie, Alt-Text).",
+        variant: "destructive",
+      });
+      return;
+    }
+    editImageMutation.mutate(formData);
+  };
+
+  const handleEditButtonClick = (image: GalleryImage) => {
+    setEditingImageId(image.id);
+    setFormData({
+      imageUrl: image.imageUrl,
+      title: image.title,
+      description: image.description || "",
+      category: image.category,
+      altText: image.altText,
+    });
+    setShowEditModal(true);
   };
 
   const handleGetUploadParameters = async (file: any) => {
@@ -401,6 +464,7 @@ const AdminGallery = () => {
                     <Button 
                       size="sm" 
                       variant="outline"
+                      onClick={() => handleEditButtonClick(image)}
                       data-testid={`button-edit-${image.id}`}
                     >
                       <Edit2 className="w-4 h-4" />
@@ -567,15 +631,165 @@ const AdminGallery = () => {
                   variant="outline"
                   onClick={() => {
                     setShowAddModal(false);
-                    setFormData({
-                      imageUrl: "",
-                      title: "",
-                      description: "",
-                      category: "",
-                      altText: "",
-                    });
+                    resetForm();
                   }}
                   data-testid="button-cancel"
+                >
+                  Abbrechen
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Image Modal */}
+        <Dialog open={showEditModal} onOpenChange={setShowEditModal}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Bild bearbeiten</DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-6">
+              <div>
+                <Label>Bild hochladen *</Label>
+                <div className="mt-2">
+                  <ObjectUploader
+                    maxNumberOfFiles={1}
+                    maxFileSize={10485760}
+                    onGetUploadParameters={handleGetUploadParameters}
+                    onComplete={handleUploadComplete}
+                    buttonClassName="w-full bg-forest hover:bg-forest/90 text-white"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    {formData.imageUrl ? "Anderes Bild hochladen" : "Bild auswählen und hochladen"}
+                  </ObjectUploader>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="edit-title">Titel *</Label>
+                  <Input
+                    id="edit-title"
+                    placeholder="Schmuckstück Titel"
+                    value={formData.title}
+                    onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                    data-testid="input-edit-title"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="edit-altText">Alt-Text *</Label>
+                  <Input
+                    id="edit-altText"
+                    placeholder="Beschreibung für Screenreader"
+                    value={formData.altText}
+                    onChange={(e) => setFormData(prev => ({ ...prev, altText: e.target.value }))}
+                    data-testid="input-edit-alt-text"
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <Label htmlFor="edit-description">Beschreibung</Label>
+                <Textarea
+                  id="edit-description"
+                  placeholder="Beschreibung des Schmuckstücks..."
+                  value={formData.description}
+                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  data-testid="input-edit-description"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="edit-category">Kategorie *</Label>
+                <Popover open={editOpen} onOpenChange={setEditOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={editOpen}
+                      className="w-full justify-between mt-2"
+                      data-testid="button-edit-category-select"
+                    >
+                      {selectedCategoryName || "Kategorie wählen..."}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full p-0">
+                    <Command>
+                      <CommandInput 
+                        placeholder="Kategorie suchen oder neue eingeben..." 
+                        value={formData.category}
+                        onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
+                      />
+                      <CommandEmpty>
+                        Drücken Sie Enter um "{formData.category}" als neue Kategorie hinzuzufügen.
+                      </CommandEmpty>
+                      <CommandGroup>
+                        {allCategoryOptions.map((categoryId) => {
+                          const categoryName = categories.find(cat => cat.id === categoryId)?.name || categoryId;
+                          return (
+                            <CommandItem
+                              key={categoryId}
+                              value={categoryId}
+                              onSelect={(currentValue) => {
+                                setFormData(prev => ({ ...prev, category: currentValue }));
+                                setEditOpen(false);
+                              }}
+                              data-testid={`option-edit-category-${categoryId}`}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  formData.category === categoryId ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                              {categoryName}
+                            </CommandItem>
+                          );
+                        })}
+                      </CommandGroup>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {/* Image Preview */}
+              {formData.imageUrl && (
+                <div>
+                  <Label>Vorschau</Label>
+                  <div className="mt-2 border rounded-lg overflow-hidden">
+                    <img
+                      src={formData.imageUrl}
+                      alt={formData.altText || "Vorschau"}
+                      className="w-full h-48 object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200'%3E%3Crect width='400' height='200' fill='%23f3f4f6'/%3E%3Ctext x='200' y='100' text-anchor='middle' fill='%236b7280'%3EBild konnte nicht geladen werden%3C/text%3E%3C/svg%3E";
+                      }}
+                      data-testid="image-edit-preview"
+                    />
+                  </div>
+                </div>
+              )}
+              
+              <div className="flex gap-3 pt-4">
+                <Button
+                  onClick={handleEditImage}
+                  disabled={editImageMutation.isPending}
+                  className="bg-forest hover:bg-forest/90 text-white"
+                  data-testid="button-update-image"
+                >
+                  {editImageMutation.isPending ? "Wird aktualisiert..." : "Bild aktualisieren"}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowEditModal(false);
+                    setEditingImageId(null);
+                    resetForm();
+                  }}
+                  data-testid="button-edit-cancel"
                 >
                   Abbrechen
                 </Button>
