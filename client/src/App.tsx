@@ -15,7 +15,6 @@ import ProductPage from "@/pages/product";
 import AdminLogin from "@/pages/admin-login";
 import AdminDashboard from "@/pages/admin-dashboard";
 import AdminGallery from "@/pages/admin-gallery";
-import FontDemo from "@/pages/font-demo";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import ShoppingCart from "@/components/shopping-cart";
@@ -33,7 +32,6 @@ function Router() {
       <Route path="/admin" component={AdminLogin} />
       <Route path="/admin/dashboard" component={AdminDashboard} />
       <Route path="/admin/gallery" component={AdminGallery} />
-      <Route path="/font-demo" component={FontDemo} />
       <Route component={NotFound} />
     </Switch>
   );

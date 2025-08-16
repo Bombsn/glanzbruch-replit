@@ -85,10 +85,7 @@ const Home = () => {
             />
           </div>
 
-          <h1 className="font-heading text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
-            <span className="font-heading text-gold block text-2xl md:text-3xl mb-2">
-              Glanzbruch
-            </span>
+          <h1 className="font-logo text-4xl md:text-6xl lg:text-7xl text-white mb-6 leading-tight">
             Wald- und Wiesenschmuck
           </h1>
 
