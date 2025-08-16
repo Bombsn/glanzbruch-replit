@@ -72,7 +72,7 @@ const Home = () => {
               "url('https://images.unsplash.com/photo-1441974231531-c6227db76b6e?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80')",
             backgroundSize: "cover",
             backgroundPosition: "center",
-            filter: "sepia(30%) saturate(0.7) contrast(1.2) brightness(1.1) blur(0.5px)",
+            filter: "sepia(20%) saturate(1.3) contrast(1.5) brightness(1.2) blur(1px) hue-rotate(15deg)",
           }}
         />
 
