@@ -69,7 +69,7 @@ const AdminGallery = () => {
 
   // Load gallery images
   const { data: galleryImages = [], isLoading } = useQuery<GalleryImage[]>({
-    queryKey: ['/api/gallery'],
+    queryKey: ['/api/admin/gallery'],
   });
 
   // Delete mutation
@@ -78,6 +78,7 @@ const AdminGallery = () => {
       await apiRequest(`/api/gallery/${id}`, "DELETE");
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/gallery'] });
       queryClient.invalidateQueries({ queryKey: ['/api/gallery'] });
       toast({
         title: "Bild gelöscht",
@@ -99,6 +100,7 @@ const AdminGallery = () => {
       await apiRequest(`/api/gallery/${id}`, "PUT", { isVisible });
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/gallery'] });
       queryClient.invalidateQueries({ queryKey: ['/api/gallery'] });
       toast({
         title: "Sichtbarkeit geändert",
@@ -127,6 +129,7 @@ const AdminGallery = () => {
       });
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/gallery'] });
       queryClient.invalidateQueries({ queryKey: ['/api/gallery'] });
       setShowAddModal(false);
       setFormData({

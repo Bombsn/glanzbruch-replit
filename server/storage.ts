@@ -65,6 +65,7 @@ export interface IStorage {
   
   // Gallery Images
   getGalleryImages(): Promise<GalleryImage[]>;
+  getAllGalleryImages(): Promise<GalleryImage[]>; // For admin - includes hidden images
   getGalleryImagesByCategory(category: string): Promise<GalleryImage[]>;
   createGalleryImage(image: InsertGalleryImage): Promise<GalleryImage>;
   updateGalleryImage(id: string, image: Partial<InsertGalleryImage>): Promise<GalleryImage | undefined>;

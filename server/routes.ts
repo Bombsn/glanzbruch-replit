@@ -368,6 +368,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin Gallery API Route - includes hidden images
+  app.get("/api/admin/gallery", async (req, res) => {
+    try {
+      const images = await storage.getAllGalleryImages();
+      res.json(images);
+    } catch (error) {
+      console.error("Failed to fetch all gallery images:", error);
+      res.status(500).json({ message: "Failed to fetch gallery images" });
+    }
+  });
+
   app.get("/api/gallery/category/:category", async (req, res) => {
     try {
       const { category } = req.params;

@@ -221,6 +221,10 @@ export class DatabaseStorage implements IStorage {
     return await db.select().from(galleryImages).where(eq(galleryImages.isVisible, true)).orderBy(asc(galleryImages.sortOrder), asc(galleryImages.createdAt));
   }
 
+  async getAllGalleryImages(): Promise<GalleryImage[]> {
+    return await db.select().from(galleryImages).orderBy(asc(galleryImages.sortOrder), asc(galleryImages.createdAt));
+  }
+
   async getGalleryImagesByCategory(category: string): Promise<GalleryImage[]> {
     return await db.select().from(galleryImages)
       .where(and(eq(galleryImages.category, category), eq(galleryImages.isVisible, true)))
