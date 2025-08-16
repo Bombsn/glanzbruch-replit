@@ -3,7 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { Eye, Heart, Star, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Eye, Heart, Star, X, ChevronLeft, ChevronRight, AlertTriangle } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import type { GalleryImage } from "@shared/schema";
 
@@ -11,6 +11,7 @@ const Gallery = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [imageErrors, setImageErrors] = useState<Set<string>>(new Set());
 
   const categories = [
     { id: "all", name: "Alle Bilder", description: "Komplette Sammlung" },
@@ -55,6 +56,19 @@ const Gallery = () => {
     if (e.key === 'Escape') closeLightbox();
     if (e.key === 'ArrowRight') nextImage();
     if (e.key === 'ArrowLeft') prevImage();
+  };
+
+  const handleImageError = (imageId: string) => {
+    setImageErrors(prev => new Set([...Array.from(prev), imageId]));
+  };
+
+  const getImageUrl = (imageUrl: string) => {
+    // If it's an Object Storage path, ensure it starts with the correct base
+    if (imageUrl.startsWith('/objects/')) {
+      return imageUrl; // These should work through our /objects/ route
+    }
+    // For external URLs, we'll try to load them but handle errors gracefully
+    return imageUrl;
   };
 
   return (
@@ -125,29 +139,43 @@ const Gallery = () => {
           <div className="columns-1 sm:columns-2 md:columns-3 gap-0">
             {filteredImages.map((image, index) => (
               <div key={image.id} className="group relative break-inside-avoid block w-full mb-0">
-                <img
-                  src={image.imageUrl}
-                  alt={image.altText}
-                  className="w-full h-auto object-cover transition-all duration-300 group-hover:brightness-75 block cursor-pointer"
-                  data-testid={`gallery-image-${image.id}`}
-                  onClick={() => openLightbox(index)}
-                />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <Button
-                      size="sm"
-                      className="bg-white/90 text-forest hover:bg-white"
-                      data-testid={`button-view-image-${image.id}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openLightbox(index);
-                      }}
-                    >
-                      <Eye className="w-4 h-4 mr-2" />
-                      Vergrößern
-                    </Button>
+                {imageErrors.has(image.id) ? (
+                  <div className="w-full min-h-[200px] bg-gray-100 flex items-center justify-center border-2 border-gray-200 rounded-lg">
+                    <div className="text-center p-4">
+                      <AlertTriangle className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                      <p className="text-sm text-gray-500 mb-1">Bild nicht verfügbar</p>
+                      <p className="text-xs text-gray-400">{image.title}</p>
+                    </div>
                   </div>
-                </div>
+                ) : (
+                  <>
+                    <img
+                      src={getImageUrl(image.imageUrl)}
+                      alt={image.altText}
+                      className="w-full h-auto object-cover transition-all duration-300 group-hover:brightness-75 block cursor-pointer"
+                      data-testid={`gallery-image-${image.id}`}
+                      onClick={() => openLightbox(index)}
+                      onError={() => handleImageError(image.id)}
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
+                      <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <Button
+                          size="sm"
+                          className="bg-white/90 text-forest hover:bg-white"
+                          data-testid={`button-view-image-${image.id}`}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            openLightbox(index);
+                          }}
+                        >
+                          <Eye className="w-4 h-4 mr-2" />
+                          Vergrößern
+                        </Button>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             ))}
           </div>
@@ -247,18 +275,29 @@ const Gallery = () => {
               {selectedImageIndex !== null && filteredImages[selectedImageIndex] && (
                 <div className="absolute inset-0 flex flex-col">
                   <div className="flex-1 flex items-center justify-center p-4 min-h-0">
-                    <img
-                      src={filteredImages[selectedImageIndex].imageUrl}
-                      alt={filteredImages[selectedImageIndex].altText}
-                      className="w-full h-full object-contain rounded-lg shadow-2xl"
-                      style={{ 
-                        maxWidth: '90vw', 
-                        maxHeight: 'calc(100vh - 200px)',
-                        minWidth: '60vw',
-                        minHeight: '60vh'
-                      }}
-                      data-testid={`lightbox-image-${filteredImages[selectedImageIndex].id}`}
-                    />
+                    {imageErrors.has(filteredImages[selectedImageIndex].id) ? (
+                      <div className="w-full h-full flex items-center justify-center text-white">
+                        <div className="text-center">
+                          <AlertTriangle className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                          <h3 className="text-xl mb-2">Bild nicht verfügbar</h3>
+                          <p className="text-gray-300">{filteredImages[selectedImageIndex].title}</p>
+                        </div>
+                      </div>
+                    ) : (
+                      <img
+                        src={getImageUrl(filteredImages[selectedImageIndex].imageUrl)}
+                        alt={filteredImages[selectedImageIndex].altText}
+                        className="w-full h-full object-contain rounded-lg shadow-2xl"
+                        style={{ 
+                          maxWidth: '90vw', 
+                          maxHeight: 'calc(100vh - 200px)',
+                          minWidth: '60vw',
+                          minHeight: '60vh'
+                        }}
+                        data-testid={`lightbox-image-${filteredImages[selectedImageIndex].id}`}
+                        onError={() => handleImageError(filteredImages[selectedImageIndex].id)}
+                      />
+                    )}
                   </div>
                   
                   {/* Image Info */}
