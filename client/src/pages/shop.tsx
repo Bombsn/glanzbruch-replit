@@ -92,38 +92,46 @@ const Shop = () => {
           </p>
         </div>
 
-        {/* Filters */}
-        <div className="flex flex-col md:flex-row gap-4 mb-8 p-6 bg-white rounded-lg shadow-sm">
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-charcoal mb-2">Kategorie</label>
-            <Select value={selectedCategory} onValueChange={handleCategoryChange} data-testid="select-category">
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((category) => (
-                  <SelectItem key={category.value} value={category.value}>
-                    {category.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+        {/* Category Filter Buttons */}
+        <div className="mb-8">
+          <div className="text-center mb-6">
+            <h3 className="text-lg font-medium text-charcoal mb-4">Kategorie wählen</h3>
+            <div className="flex flex-wrap gap-3 justify-center">
+              {categories.map((category) => (
+                <Button
+                  key={category.value}
+                  variant={selectedCategory === category.value ? "default" : "outline"}
+                  onClick={() => handleCategoryChange(category.value)}
+                  className={`px-6 py-3 rounded-full transition-all duration-300 ${
+                    selectedCategory === category.value
+                      ? "bg-forest text-white shadow-lg"
+                      : "border-forest text-forest hover:bg-forest hover:text-white"
+                  }`}
+                  data-testid={`button-category-${category.value}`}
+                >
+                  {category.label}
+                </Button>
+              ))}
+            </div>
           </div>
-
-          <div className="flex-1">
-            <label className="block text-sm font-medium text-charcoal mb-2">Sortieren nach</label>
-            <Select value={sortBy} onValueChange={setSortBy} data-testid="select-sort">
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {sortOptions.map((option) => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          
+          {/* Sort Options */}
+          <div className="flex justify-center">
+            <div className="flex flex-col items-center">
+              <label className="block text-sm font-medium text-charcoal mb-3">Sortieren nach</label>
+              <Select value={sortBy} onValueChange={setSortBy} data-testid="select-sort">
+                <SelectTrigger className="w-64">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {sortOptions.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </div>
 
