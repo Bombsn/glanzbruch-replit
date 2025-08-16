@@ -18,6 +18,7 @@ interface CartStore {
   toggleCart: () => void;
   getTotal: () => number;
   getItemCount: () => number;
+  isItemInCart: (id: string) => boolean;
 }
 
 export const useCartStore = create<CartStore>((set, get) => ({
@@ -65,5 +66,10 @@ export const useCartStore = create<CartStore>((set, get) => ({
   getItemCount: () => {
     const { items } = get();
     return items.reduce((count, item) => count + item.quantity, 0);
+  },
+
+  isItemInCart: (id) => {
+    const { items } = get();
+    return items.some(item => item.id === id);
   }
 }));

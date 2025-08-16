@@ -1,6 +1,6 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ShoppingBag, ArrowRight } from "lucide-react";
+import { ShoppingBag, ArrowRight, Check } from "lucide-react";
 import { useCartStore } from "@/lib/store";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
@@ -11,8 +11,9 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
-  const { addItem } = useCartStore();
+  const { addItem, isItemInCart } = useCartStore();
   const { toast } = useToast();
+  const isInCart = isItemInCart(product.id);
 
   const handleAddToCart = () => {
     addItem({
@@ -119,12 +120,25 @@ const ProductCard = ({ product }: ProductCardProps) => {
           
           <Button
             onClick={handleAddToCart}
-            disabled={!product.inStock}
-            className="w-full bg-forest hover:bg-forest/90 text-white"
+            disabled={!product.inStock || isInCart}
+            className={`w-full ${
+              isInCart 
+                ? "bg-sage/20 text-sage border border-sage hover:bg-sage/30" 
+                : "bg-forest hover:bg-forest/90 text-white"
+            }`}
             data-testid={`button-add-to-cart-${product.id}`}
           >
-            <ShoppingBag className="w-4 h-4 mr-2" />
-            {product.inStock ? "In den Warenkorb" : "Ausverkauft"}
+            {isInCart ? (
+              <>
+                <Check className="w-4 h-4 mr-2" />
+                Hinzugefügt
+              </>
+            ) : (
+              <>
+                <ShoppingBag className="w-4 h-4 mr-2" />
+                {product.inStock ? "In den Warenkorb" : "Ausverkauft"}
+              </>
+            )}
           </Button>
         </div>
       </CardContent>

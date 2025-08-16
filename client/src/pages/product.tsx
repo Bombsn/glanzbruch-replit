@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useRoute } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import { ShoppingBag, ArrowLeft, Heart, Share, Truck, Shield, Clock } from "lucide-react";
+import { ShoppingBag, ArrowLeft, Heart, Share, Truck, Shield, Clock, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -14,13 +14,15 @@ const ProductPage = () => {
   const [, params] = useRoute("/produkt/:id");
   const productId = params?.id;
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const { addItem } = useCartStore();
+  const { addItem, isItemInCart } = useCartStore();
   const { toast } = useToast();
 
   const { data: product, isLoading, error } = useQuery<Product>({
     queryKey: ["/api/products", productId],
     enabled: !!productId,
   });
+
+  const isInCart = product ? isItemInCart(product.id) : false;
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -201,13 +203,26 @@ const ProductPage = () => {
             {/* Add to Cart */}
             <Button
               onClick={handleAddToCart}
-              disabled={!product.inStock}
+              disabled={!product.inStock || isInCart}
               size="lg"
-              className="w-full bg-forest hover:bg-forest/80 text-cream disabled:bg-gray-300 disabled:text-gray-500"
+              className={`w-full ${
+                isInCart 
+                  ? "bg-sage/20 text-sage border border-sage hover:bg-sage/30" 
+                  : "bg-forest hover:bg-forest/80 text-cream"
+              } disabled:bg-gray-300 disabled:text-gray-500`}
               data-testid="button-add-to-cart"
             >
-              <ShoppingBag className="w-5 h-5 mr-2" />
-              {product.inStock ? "In den Warenkorb" : "Ausverkauft"}
+              {isInCart ? (
+                <>
+                  <Check className="w-5 h-5 mr-2" />
+                  Hinzugefügt
+                </>
+              ) : (
+                <>
+                  <ShoppingBag className="w-5 h-5 mr-2" />
+                  {product.inStock ? "In den Warenkorb" : "Ausverkauft"}
+                </>
+              )}
             </Button>
 
             {/* Action Buttons */}
