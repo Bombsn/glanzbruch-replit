@@ -142,6 +142,62 @@ export class DatabaseStorage implements IStorage {
     return course || undefined;
   }
 
+  async getCourseWithType(id: string): Promise<CourseWithType | undefined> {
+    const result = await db.select({
+      id: courses.id,
+      courseTypeId: courses.courseTypeId,
+      title: courses.title,
+      date: courses.date,
+      startTime: courses.startTime,
+      endTime: courses.endTime,
+      maxParticipants: courses.maxParticipants,
+      availableSpots: courses.availableSpots,
+      location: courses.location,
+      instructor: courses.instructor,
+      status: courses.status,
+      notes: courses.notes,
+      createdAt: courses.createdAt,
+      courseType: {
+        id: courseTypes.id,
+        name: courseTypes.name,
+        description: courseTypes.description,
+        price: courseTypes.price,
+        duration: courseTypes.duration,
+        maxParticipants: courseTypes.maxParticipants,
+        minAge: courseTypes.minAge,
+        materials: courseTypes.materials,
+        requirements: courseTypes.requirements,
+        imageUrl: courseTypes.imageUrl,
+        createdAt: courseTypes.createdAt,
+      }
+    })
+    .from(courses)
+    .leftJoin(courseTypes, eq(courses.courseTypeId, courseTypes.id))
+    .where(eq(courses.id, id));
+
+    if (result.length === 0) {
+      return undefined;
+    }
+
+    const row = result[0];
+    return {
+      id: row.id,
+      courseTypeId: row.courseTypeId,
+      title: row.title,
+      date: row.date,
+      startTime: row.startTime,
+      endTime: row.endTime,
+      maxParticipants: row.maxParticipants,
+      availableSpots: row.availableSpots,
+      location: row.location,
+      instructor: row.instructor,
+      status: row.status,
+      notes: row.notes,
+      createdAt: row.createdAt,
+      courseType: row.courseType!
+    };
+  }
+
   async createCourse(course: InsertCourse): Promise<Course> {
     const [newCourse] = await db.insert(courses).values(course).returning();
     return newCourse;

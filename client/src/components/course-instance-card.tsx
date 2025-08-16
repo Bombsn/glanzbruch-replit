@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -86,26 +87,30 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
     <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
       <div className="flex">
         {/* Image Section */}
-        <div className="relative w-48 h-32 flex-shrink-0">
-          <img
-            src={course.courseType.imageUrl}
-            alt={course.courseType.name}
-            className="w-full h-full object-cover"
-            data-testid={`course-image-${course.id}`}
-          />
-          <div className="absolute top-2 left-2">
-            <Badge variant="secondary" className="bg-white/90 text-forest text-xs">
-              {course.availableSpots} Plätze verfügbar
-            </Badge>
+        <Link href={`/kurs/${course.id}`}>
+          <div className="relative w-48 h-32 flex-shrink-0 cursor-pointer hover:opacity-90 transition-opacity">
+            <img
+              src={course.courseType.imageUrl}
+              alt={course.courseType.name}
+              className="w-full h-full object-cover"
+              data-testid={`course-image-${course.id}`}
+            />
+            <div className="absolute top-2 left-2">
+              <Badge variant="secondary" className="bg-white/90 text-forest text-xs">
+                {course.availableSpots} Plätze verfügbar
+              </Badge>
+            </div>
           </div>
-        </div>
+        </Link>
         
         {/* Content Section */}
         <CardContent className="p-4 flex-1 flex flex-col justify-between">
           <div>
-            <h3 className="font-heading text-lg font-semibold text-forest mb-3" data-testid={`course-title-${course.id}`}>
-              {course.title}
-            </h3>
+            <Link href={`/kurs/${course.id}`}>
+              <h3 className="font-heading text-lg font-semibold text-forest mb-3 cursor-pointer hover:text-gold transition-colors" data-testid={`course-title-${course.id}`}>
+                {course.title}
+              </h3>
+            </Link>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-charcoal">
               <div className="flex items-center">

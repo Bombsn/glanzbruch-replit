@@ -12,6 +12,7 @@ import Gallery from "@/pages/gallery";
 import About from "@/pages/about";
 import Contact from "@/pages/contact";
 import ProductPage from "@/pages/product";
+import CourseDetailPage from "@/pages/course-detail";
 import AdminLogin from "@/pages/admin-login";
 import AdminDashboard from "@/pages/admin-dashboard";
 import AdminGallery from "@/pages/admin-gallery";
@@ -25,6 +26,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/shop" component={Shop} />
       <Route path="/kurse" component={Courses} />
+      <Route path="/kurs/:id" component={CourseDetailPage} />
       <Route path="/galerie" component={Gallery} />
       <Route path="/ueber-mich" component={About} />
       <Route path="/kontakt" component={Contact} />
