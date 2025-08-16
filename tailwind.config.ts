@@ -73,6 +73,7 @@ export default {
         serif: ["var(--font-body)"],
         mono: ["var(--font-mono)"],
         heading: ["var(--font-heading)"],
+        logo: ["var(--font-logo)"],
         body: ["var(--font-body)"],
       },
       keyframes: {
