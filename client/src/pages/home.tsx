@@ -338,7 +338,7 @@ const Home = () => {
                 </div>
               </div>
 
-              <Link href="/kontakt">
+              <Link href="/kontakt?tab=sonderanfertigung">
                 <Button
                   className="bg-forest hover:bg-forest/90 text-white px-8 py-3 rounded-full font-semibold transition-all duration-300"
                   data-testid="button-request-commission"

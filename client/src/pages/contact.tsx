@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,7 +20,17 @@ type CommissionFormData = z.infer<typeof insertCommissionRequestSchema>;
 const Contact = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [location] = useLocation();
   const [activeForm, setActiveForm] = useState<"general" | "commission">("general");
+
+  // Check URL parameters to activate the correct tab
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tab = urlParams.get('tab');
+    if (tab === 'sonderanfertigung') {
+      setActiveForm("commission");
+    }
+  }, [location]);
 
   // General contact form
   const [generalForm, setGeneralForm] = useState({

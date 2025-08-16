@@ -165,7 +165,7 @@ const Shop = () => {
             Kontaktieren Sie mich für eine persönliche Beratung.
           </p>
           <Button 
-            onClick={() => setLocation("/kontakt")}
+            onClick={() => setLocation("/kontakt?tab=sonderanfertigung")}
             className="bg-gold hover:bg-gold/90 text-white px-8 py-3 rounded-full font-semibold"
             data-testid="button-contact-custom"
           >
