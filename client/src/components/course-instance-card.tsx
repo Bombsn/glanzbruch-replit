@@ -30,11 +30,7 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const form = useForm<BookingFormData>({
-    resolver: zodResolver(insertCourseBookingSchema.extend({
-      participants: z.coerce.number()
-        .min(1, "Mindestens 1 Teilnehmer erforderlich")
-        .max(course.availableSpots, `Maximal ${course.availableSpots} Plätze verfügbar`)
-    })),
+    resolver: zodResolver(insertCourseBookingSchema),
     defaultValues: {
       courseId: course.id,
       customerName: "",
@@ -263,10 +259,13 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Anzahl Teilnehmer *</FormLabel>
-                        <Select onValueChange={field.onChange} value={field.value?.toString()}>
+                        <Select 
+                          onValueChange={(value) => field.onChange(parseInt(value))} 
+                          value={field.value?.toString() || "1"}
+                        >
                           <FormControl>
                             <SelectTrigger data-testid="select-participants">
-                              <SelectValue placeholder="Wählen Sie die Anzahl Teilnehmer" />
+                              <SelectValue placeholder="1 Person" />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -278,6 +277,9 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
                           </SelectContent>
                         </Select>
                         <FormMessage />
+                        <p className="text-xs text-charcoal/60">
+                          Verfügbar: {course.availableSpots} Plätze
+                        </p>
                       </FormItem>
                     )}
                   />
