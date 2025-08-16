@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Eye, Heart, Star } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Eye, Heart, Star, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import type { GalleryImage } from "@shared/schema";
 
 const Gallery = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedImageIndex, setSelectedImageIndex] = useState<number | null>(null);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
   const categories = [
     { id: "all", name: "Alle Bilder", description: "Komplette Sammlung" },
@@ -24,6 +27,34 @@ const Gallery = () => {
   const filteredImages = selectedCategory === "all" 
     ? galleryImages 
     : galleryImages.filter(img => img.category === selectedCategory);
+
+  const openLightbox = (index: number) => {
+    setSelectedImageIndex(index);
+    setIsLightboxOpen(true);
+  };
+
+  const closeLightbox = () => {
+    setIsLightboxOpen(false);
+    setSelectedImageIndex(null);
+  };
+
+  const nextImage = () => {
+    if (selectedImageIndex !== null && selectedImageIndex < filteredImages.length - 1) {
+      setSelectedImageIndex(selectedImageIndex + 1);
+    }
+  };
+
+  const prevImage = () => {
+    if (selectedImageIndex !== null && selectedImageIndex > 0) {
+      setSelectedImageIndex(selectedImageIndex - 1);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowRight') nextImage();
+    if (e.key === 'ArrowLeft') prevImage();
+  };
 
   return (
     <div className="min-h-screen bg-cream py-16">
@@ -90,14 +121,15 @@ const Gallery = () => {
             </Button>
           </div>
         ) : (
-          <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-0">
-            {filteredImages.map((image) => (
+          <div className="columns-1 sm:columns-2 md:columns-3 gap-0">
+            {filteredImages.map((image, index) => (
               <div key={image.id} className="group relative break-inside-avoid block w-full mb-0">
                 <img
                   src={image.imageUrl}
                   alt={image.altText}
-                  className="w-full h-auto object-cover transition-all duration-300 group-hover:brightness-75 block"
+                  className="w-full h-auto object-cover transition-all duration-300 group-hover:brightness-75 block cursor-pointer"
                   data-testid={`gallery-image-${image.id}`}
+                  onClick={() => openLightbox(index)}
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -105,9 +137,13 @@ const Gallery = () => {
                       size="sm"
                       className="bg-white/90 text-forest hover:bg-white"
                       data-testid={`button-view-image-${image.id}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openLightbox(index);
+                      }}
                     >
                       <Eye className="w-4 h-4 mr-2" />
-                      Ansehen
+                      Vergrößern
                     </Button>
                   </div>
                 </div>
@@ -158,6 +194,80 @@ const Gallery = () => {
             </Button>
           </div>
         </div>
+
+        {/* Lightbox Modal */}
+        <Dialog open={isLightboxOpen} onOpenChange={setIsLightboxOpen}>
+          <DialogContent 
+            className="max-w-[95vw] max-h-[95vh] w-auto h-auto p-0 bg-black/95 border-none"
+            onKeyDown={handleKeyPress}
+          >
+            <div className="relative w-full h-full flex items-center justify-center">
+              {/* Close Button */}
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute top-4 right-4 z-50 text-white hover:bg-white/20 rounded-full"
+                onClick={closeLightbox}
+                data-testid="button-close-lightbox"
+              >
+                <X className="w-6 h-6" />
+              </Button>
+
+              {/* Previous Button */}
+              {selectedImageIndex !== null && selectedImageIndex > 0 && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute left-4 top-1/2 -translate-y-1/2 z-50 text-white hover:bg-white/20 rounded-full"
+                  onClick={prevImage}
+                  data-testid="button-prev-image"
+                >
+                  <ChevronLeft className="w-8 h-8" />
+                </Button>
+              )}
+
+              {/* Next Button */}
+              {selectedImageIndex !== null && selectedImageIndex < filteredImages.length - 1 && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 z-50 text-white hover:bg-white/20 rounded-full"
+                  onClick={nextImage}
+                  data-testid="button-next-image"
+                >
+                  <ChevronRight className="w-8 h-8" />
+                </Button>
+              )}
+
+              {/* Image */}
+              {selectedImageIndex !== null && filteredImages[selectedImageIndex] && (
+                <div className="flex flex-col items-center justify-center max-w-full max-h-full p-8">
+                  <img
+                    src={filteredImages[selectedImageIndex].imageUrl}
+                    alt={filteredImages[selectedImageIndex].altText}
+                    className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl"
+                    data-testid={`lightbox-image-${filteredImages[selectedImageIndex].id}`}
+                  />
+                  
+                  {/* Image Info */}
+                  <div className="text-center mt-6 text-white max-w-2xl">
+                    <h3 className="text-xl font-semibold mb-2">
+                      {filteredImages[selectedImageIndex].title}
+                    </h3>
+                    {filteredImages[selectedImageIndex].description && (
+                      <p className="text-gray-300 text-sm">
+                        {filteredImages[selectedImageIndex].description}
+                      </p>
+                    )}
+                    <p className="text-gray-400 text-xs mt-2">
+                      Bild {selectedImageIndex + 1} von {filteredImages.length}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
