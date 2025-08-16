@@ -44,7 +44,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
   };
 
   return (
-    <Card className="group cursor-pointer overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full">
+    <Card className="group cursor-pointer overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 flex flex-col h-full min-w-[280px]">
       <Link href={`/produkt/${product.id}`} className="flex flex-col h-full">
         <div className="relative">
           <img
@@ -69,7 +69,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           </span>
         </div>
         
-        <h3 className="font-heading text-xl font-semibold text-forest mb-2" data-testid={`product-name-${product.id}`}>
+        <h3 className="font-heading text-lg font-semibold text-forest mb-2 leading-tight" data-testid={`product-name-${product.id}`}>
           {product.name}
         </h3>
         
