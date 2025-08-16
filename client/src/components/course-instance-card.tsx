@@ -263,7 +263,7 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Anzahl Teilnehmer *</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
+                        <Select onValueChange={field.onChange} value={field.value?.toString()}>
                           <FormControl>
                             <SelectTrigger data-testid="select-participants">
                               <SelectValue placeholder="Wählen Sie die Anzahl Teilnehmer" />
