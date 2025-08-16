@@ -110,9 +110,7 @@ const Courses = () => {
 
         {/* Available Courses */}
         <div className="mb-16">
-          <h2 className="font-heading text-3xl font-bold text-forest mb-8 text-center" data-testid="heading-available-courses">
-            Verfügbare Kurse
-          </h2>
+          <h2 className="font-heading text-3xl font-bold text-forest mb-8 text-center" data-testid="heading-available-courses">Anstehende Kurse</h2>
           
           {courses.length === 0 ? (
             <div className="text-center py-16 bg-white rounded-xl shadow-sm">
