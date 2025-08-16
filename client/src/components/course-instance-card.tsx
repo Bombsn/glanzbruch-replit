@@ -95,9 +95,10 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
   };
 
   return (
-    <Link href={`/kurs/${course.id}`}>
-      <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer">
-        <div className="flex">
+    <div className="relative">
+      <Link href={`/kurs/${course.id}`}>
+        <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer">
+          <div className="flex">
           {/* Image Section */}
           <div className="relative w-48 h-32 flex-shrink-0">
             <img
@@ -169,20 +170,24 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
             
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
-                <Button 
-                  className="bg-gold hover:bg-gold/90 text-white"
+                <div
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     setIsDialogOpen(true);
                   }}
-                  data-testid={`button-book-course-${course.id}`}
+                  className="relative z-10"
                 >
-                  Jetzt buchen
-                </Button>
+                  <Button 
+                    className="bg-gold hover:bg-gold/90 text-white"
+                    data-testid={`button-book-course-${course.id}`}
+                  >
+                    Jetzt buchen
+                  </Button>
+                </div>
               </DialogTrigger>
             <DialogContent 
-              className="sm:max-w-[425px]"
+              className="sm:max-w-[425px] z-50"
               onPointerDownOutside={(e) => e.preventDefault()}
               onInteractOutside={(e) => e.preventDefault()}
             >
@@ -337,11 +342,12 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
               </Form>
             </DialogContent>
           </Dialog>
-          </div>
-        </CardContent>
-      </div>
-    </Card>
-    </Link>
+            </div>
+          </CardContent>
+        </div>
+      </Card>
+      </Link>
+    </div>
   );
 };
 
