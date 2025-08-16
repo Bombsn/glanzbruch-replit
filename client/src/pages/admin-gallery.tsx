@@ -13,6 +13,16 @@ import {
   DialogTrigger 
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Command,
   CommandEmpty,
   CommandGroup,
@@ -50,6 +60,8 @@ const AdminGallery = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editingImageId, setEditingImageId] = useState<string | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [imageToDelete, setImageToDelete] = useState<{ id: string; title: string } | null>(null);
   const [open, setOpen] = useState(false);
   const [editOpen, setEditOpen] = useState(false);
   const [formData, setFormData] = useState({
@@ -186,10 +198,22 @@ const AdminGallery = () => {
     ? galleryImages 
     : galleryImages.filter(img => img.category === selectedCategory);
 
-  const handleDelete = async (id: string, title: string) => {
-    if (window.confirm(`Möchten Sie das Bild "${title}" wirklich löschen?`)) {
-      deleteMutation.mutate(id);
+  const handleDeleteClick = (id: string, title: string) => {
+    setImageToDelete({ id, title });
+    setShowDeleteDialog(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (imageToDelete) {
+      deleteMutation.mutate(imageToDelete.id);
+      setShowDeleteDialog(false);
+      setImageToDelete(null);
     }
+  };
+
+  const handleCancelDelete = () => {
+    setShowDeleteDialog(false);
+    setImageToDelete(null);
   };
 
   const handleToggleVisibility = (id: string, currentVisibility: boolean | null) => {
@@ -473,7 +497,7 @@ const AdminGallery = () => {
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => handleDelete(image.id, image.title)}
+                      onClick={() => handleDeleteClick(image.id, image.title)}
                       disabled={deleteMutation.isPending}
                       className="text-red-600 hover:text-red-700"
                       data-testid={`button-delete-${image.id}`}
@@ -797,6 +821,35 @@ const AdminGallery = () => {
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Delete Confirmation Dialog */}
+        <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Bild löschen</AlertDialogTitle>
+              <AlertDialogDescription>
+                Möchten Sie das Bild "{imageToDelete?.title}" wirklich löschen? 
+                Diese Aktion kann nicht rückgängig gemacht werden.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel 
+                onClick={handleCancelDelete}
+                data-testid="button-cancel-delete"
+              >
+                Abbrechen
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={handleConfirmDelete}
+                disabled={deleteMutation.isPending}
+                className="bg-red-600 hover:bg-red-700 text-white"
+                data-testid="button-confirm-delete"
+              >
+                {deleteMutation.isPending ? "Wird gelöscht..." : "Löschen"}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
     </div>
   );
