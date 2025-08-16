@@ -84,11 +84,11 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
   };
 
   return (
-    <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
-      <div className="flex">
-        {/* Image Section */}
-        <Link href={`/kurs/${course.id}`}>
-          <div className="relative w-48 h-32 flex-shrink-0 cursor-pointer hover:opacity-90 transition-opacity">
+    <Link href={`/kurs/${course.id}`}>
+      <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer">
+        <div className="flex">
+          {/* Image Section */}
+          <div className="relative w-48 h-32 flex-shrink-0">
             <img
               src={course.courseType.imageUrl}
               alt={course.courseType.name}
@@ -101,16 +101,13 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
               </Badge>
             </div>
           </div>
-        </Link>
-        
-        {/* Content Section */}
-        <CardContent className="p-4 flex-1 flex flex-col justify-between">
-          <div>
-            <Link href={`/kurs/${course.id}`}>
-              <h3 className="font-heading text-lg font-semibold text-forest mb-3 cursor-pointer hover:text-gold transition-colors" data-testid={`course-title-${course.id}`}>
+          
+          {/* Content Section */}
+          <CardContent className="p-4 flex-1 flex flex-col justify-between">
+            <div>
+              <h3 className="font-heading text-lg font-semibold text-forest mb-3 hover:text-gold transition-colors" data-testid={`course-title-${course.id}`}>
                 {course.title}
               </h3>
-            </Link>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-charcoal">
               <div className="flex items-center">
@@ -163,6 +160,7 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
               <DialogTrigger asChild>
                 <Button 
                   className="bg-gold hover:bg-gold/90 text-white"
+                  onClick={(e) => e.stopPropagation()}
                   data-testid={`button-book-course-${course.id}`}
                 >
                   Jetzt buchen
@@ -278,6 +276,7 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
         </CardContent>
       </div>
     </Card>
+    </Link>
   );
 };
 
