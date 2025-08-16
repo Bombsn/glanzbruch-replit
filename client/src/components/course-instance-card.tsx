@@ -47,7 +47,7 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
   });
 
   // Watch participants field to calculate total price
-  const participants = form.watch("participants");
+  const participants = form.watch("participants") || 1;
   
   useEffect(() => {
     const basePrice = parseFloat(course.courseType.price);

@@ -122,7 +122,7 @@ const Courses = () => {
               </p>
             </div>
           ) : (
-            <div className="space-y-6">
+            <div className="space-y-8">
               {courses.map((course) => (
                 <CourseInstanceCard key={course.id} course={course} />
               ))}
