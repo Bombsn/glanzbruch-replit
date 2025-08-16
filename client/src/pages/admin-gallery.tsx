@@ -2,6 +2,9 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
 import { 
   Dialog, 
   DialogContent, 
@@ -9,6 +12,18 @@ import {
   DialogTitle, 
   DialogTrigger 
 } from "@/components/ui/dialog";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { 
@@ -18,13 +33,26 @@ import {
   EyeOff, 
   Plus,
   Image as ImageIcon,
-  Upload
+  Upload,
+  Check,
+  ChevronsUpDown
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import type { GalleryImage } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 
 const AdminGallery = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [open, setOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    imageUrl: "",
+    title: "",
+    description: "",
+    category: "",
+    altText: "",
+  });
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -44,9 +72,7 @@ const AdminGallery = () => {
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await apiRequest(`/api/gallery/${id}`, {
-        method: "DELETE",
-      });
+      await apiRequest(`/api/gallery/${id}`, "DELETE");
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/gallery'] });
@@ -67,10 +93,7 @@ const AdminGallery = () => {
   // Toggle visibility mutation
   const toggleVisibilityMutation = useMutation({
     mutationFn: async ({ id, isVisible }: { id: string; isVisible: boolean }) => {
-      await apiRequest(`/api/gallery/${id}`, {
-        method: "PUT",
-        body: { isVisible },
-      });
+      await apiRequest(`/api/gallery/${id}`, "PUT", { isVisible });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/gallery'] });
@@ -83,6 +106,42 @@ const AdminGallery = () => {
       toast({
         title: "Fehler",
         description: "Die Sichtbarkeit konnte nicht geändert werden.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Add image mutation
+  const addImageMutation = useMutation({
+    mutationFn: async (data: typeof formData) => {
+      await apiRequest('/api/gallery', "POST", {
+        imageUrl: data.imageUrl,
+        title: data.title,
+        description: data.description || null,
+        category: data.category,
+        altText: data.altText,
+        isVisible: true,
+      });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/gallery'] });
+      setShowAddModal(false);
+      setFormData({
+        imageUrl: "",
+        title: "",
+        description: "",
+        category: "",
+        altText: "",
+      });
+      toast({
+        title: "Bild hinzugefügt",
+        description: "Das Galeriebild wurde erfolgreich hinzugefügt.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Fehler",
+        description: "Das Galeriebild konnte nicht hinzugefügt werden.",
         variant: "destructive",
       });
     },
@@ -105,6 +164,24 @@ const AdminGallery = () => {
     });
   };
 
+  const handleAddImage = () => {
+    if (!formData.imageUrl || !formData.title || !formData.category || !formData.altText) {
+      toast({
+        title: "Fehlende Angaben",
+        description: "Bitte füllen Sie alle Pflichtfelder aus.",
+        variant: "destructive",
+      });
+      return;
+    }
+    addImageMutation.mutate(formData);
+  };
+
+  // Get unique categories from existing images
+  const existingCategories = Array.from(new Set(galleryImages.map(img => img.category)));
+  const allCategoryOptions = Array.from(new Set([...categories.slice(1).map(c => c.id), ...existingCategories]));
+
+  const selectedCategoryName = categories.find(cat => cat.id === formData.category)?.name || formData.category;
+
   return (
     <div className="min-h-screen bg-cream py-8">
       <div className="container mx-auto px-4">
@@ -119,7 +196,11 @@ const AdminGallery = () => {
             </p>
           </div>
           
-          <Button className="bg-forest text-white hover:bg-forest/90" data-testid="button-add-image">
+          <Button 
+            className="bg-forest text-white hover:bg-forest/90" 
+            onClick={() => setShowAddModal(true)}
+            data-testid="button-add-image"
+          >
             <Plus className="w-4 h-4 mr-2" />
             Bild hinzufügen
           </Button>
@@ -264,6 +345,164 @@ const AdminGallery = () => {
             ))}
           </div>
         )}
+
+        {/* Add Image Modal */}
+        <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Bild hinzufügen</DialogTitle>
+            </DialogHeader>
+            
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="imageUrl">Bild-URL *</Label>
+                  <Input
+                    id="imageUrl"
+                    placeholder="https://..."
+                    value={formData.imageUrl}
+                    onChange={(e) => setFormData(prev => ({ ...prev, imageUrl: e.target.value }))}
+                    data-testid="input-image-url"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="title">Titel *</Label>
+                  <Input
+                    id="title"
+                    placeholder="Schmuckstück Titel"
+                    value={formData.title}
+                    onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                    data-testid="input-title"
+                  />
+                </div>
+              </div>
+              
+              <div>
+                <Label htmlFor="description">Beschreibung</Label>
+                <Textarea
+                  id="description"
+                  placeholder="Beschreibung des Schmuckstücks..."
+                  value={formData.description}
+                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  data-testid="input-description"
+                />
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="category">Kategorie *</Label>
+                  <Popover open={open} onOpenChange={setOpen}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={open}
+                        className="w-full justify-between"
+                        data-testid="button-category-select"
+                      >
+                        {selectedCategoryName || "Kategorie wählen..."}
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-full p-0">
+                      <Command>
+                        <CommandInput 
+                          placeholder="Kategorie suchen oder neue eingeben..." 
+                          value={formData.category}
+                          onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
+                        />
+                        <CommandEmpty>
+                          Drücken Sie Enter um "{formData.category}" als neue Kategorie hinzuzufügen.
+                        </CommandEmpty>
+                        <CommandGroup>
+                          {allCategoryOptions.map((categoryId) => {
+                            const categoryName = categories.find(cat => cat.id === categoryId)?.name || categoryId;
+                            return (
+                              <CommandItem
+                                key={categoryId}
+                                value={categoryId}
+                                onSelect={(currentValue) => {
+                                  setFormData(prev => ({ ...prev, category: currentValue }));
+                                  setOpen(false);
+                                }}
+                                data-testid={`option-category-${categoryId}`}
+                              >
+                                <Check
+                                  className={cn(
+                                    "mr-2 h-4 w-4",
+                                    formData.category === categoryId ? "opacity-100" : "opacity-0"
+                                  )}
+                                />
+                                {categoryName}
+                              </CommandItem>
+                            );
+                          })}
+                        </CommandGroup>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                
+                <div>
+                  <Label htmlFor="altText">Alt-Text *</Label>
+                  <Input
+                    id="altText"
+                    placeholder="Beschreibung für Screenreader"
+                    value={formData.altText}
+                    onChange={(e) => setFormData(prev => ({ ...prev, altText: e.target.value }))}
+                    data-testid="input-alt-text"
+                  />
+                </div>
+              </div>
+
+              {/* Image Preview */}
+              {formData.imageUrl && (
+                <div>
+                  <Label>Vorschau</Label>
+                  <div className="mt-2 border rounded-lg overflow-hidden">
+                    <img
+                      src={formData.imageUrl}
+                      alt={formData.altText || "Vorschau"}
+                      className="w-full h-48 object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='200'%3E%3Crect width='400' height='200' fill='%23f3f4f6'/%3E%3Ctext x='200' y='100' text-anchor='middle' fill='%236b7280'%3EBild konnte nicht geladen werden%3C/text%3E%3C/svg%3E";
+                      }}
+                      data-testid="image-preview"
+                    />
+                  </div>
+                </div>
+              )}
+              
+              <div className="flex gap-3 pt-4">
+                <Button
+                  onClick={handleAddImage}
+                  disabled={addImageMutation.isPending}
+                  className="bg-forest hover:bg-forest/90 text-white"
+                  data-testid="button-save-image"
+                >
+                  {addImageMutation.isPending ? "Wird hinzugefügt..." : "Bild hinzufügen"}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowAddModal(false);
+                    setFormData({
+                      imageUrl: "",
+                      title: "",
+                      description: "",
+                      category: "",
+                      altText: "",
+                    });
+                  }}
+                  data-testid="button-cancel"
+                >
+                  Abbrechen
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
