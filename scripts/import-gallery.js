@@ -1,5 +1,5 @@
-const { storage } = require('../server/storage.ts');
-const { performance } = require('perf_hooks');
+import { storage } from '../server/storage.ts';
+import { performance } from 'perf_hooks';
 
 // Gallery data extracted from the website
 const galleryData = {
