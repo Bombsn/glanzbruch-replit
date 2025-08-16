@@ -213,21 +213,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Seed endpoint for initial data loading
-  app.post("/api/seed-products", async (req, res) => {
-    try {
-      if ('seedProducts' in storage) {
-        await (storage as any).seedProducts();
-        res.json({ message: "Products seeded successfully" });
-      } else {
-        res.status(400).json({ message: "Seeding not supported with current storage" });
-      }
-    } catch (error) {
-      console.error("Error seeding products:", error);
-      res.status(500).json({ message: "Failed to seed products" });
-    }
-  });
-
   // Admin endpoints
   // Simple admin login
   app.post("/api/admin/login", async (req, res) => {

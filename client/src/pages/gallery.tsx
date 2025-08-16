@@ -14,73 +14,8 @@ const Gallery = () => {
     { id: "worn", name: "Tragebilder", description: "Schmuck in Aktion" },
   ];
 
-  // Sample gallery images - in a real app, these would come from an API
-  const galleryImages = [
-    {
-      id: 1,
-      src: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-      alt: "Handgefertigter Kettenanhänger mit getrockneten Blüten",
-      category: "nature",
-      title: "Waldblüten Anhänger",
-      description: "Zarte Wildblumen eingefasst in klarem Harz"
-    },
-    {
-      id: 2,
-      src: "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-      alt: "Elegante Silber-Ohrringe mit Naturmotiven",
-      category: "silver-bronze",
-      title: "Silber Ohrringe",
-      description: "Filigrane Silberarbeit mit organischen Formen"
-    },
-    {
-      id: 3,
-      src: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-      alt: "UV-Resin Ring mit eingefassten Pflanzenteilen",
-      category: "resin",
-      title: "Harz-Ring mit Farn",
-      description: "Mystischer Ring mit eingefasstem Waldfarn"
-    },
-    {
-      id: 4,
-      src: "https://images.unsplash.com/photo-1611652022419-a9419f74343d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-      alt: "Handgefertigtes Armband mit Naturanhängern",
-      category: "silver-bronze",
-      title: "Bronze Armband",
-      description: "Robustes Armband mit Bronze-Elementen"
-    },
-    {
-      id: 5,
-      src: "https://images.unsplash.com/photo-1543294001-f7cd5d7fb155?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-      alt: "Kunde trägt handgefertigten Schmuck im Alltag",
-      category: "worn",
-      title: "Alltäglicher Begleiter",
-      description: "Glanzbruch Schmuck im täglichen Leben"
-    },
-    {
-      id: 6,
-      src: "https://images.unsplash.com/photo-1573408301185-9146fe634ad0?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-      alt: "Besonderes Erinnerungsstück mit persönlichen Elementen",
-      category: "nature",
-      title: "Erinnerungsschmuck",
-      description: "Persönliche Erinnerungen in Harz konserviert"
-    },
-    {
-      id: 7,
-      src: "https://images.unsplash.com/photo-1588444837495-c6cfeb53fa42?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-      alt: "Moderne UV-Resin Kreation mit Farbeffekten",
-      category: "resin",
-      title: "Farbspiel in Harz",
-      description: "Moderne UV-Resin Technik mit Farbverläufen"
-    },
-    {
-      id: 8,
-      src: "https://images.unsplash.com/photo-1603561591411-07134e71a2a9?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600",
-      alt: "Elegante Silberkette mit natürlichen Elementen",
-      category: "silver-bronze",
-      title: "Naturinspirierte Silberkette",
-      description: "Elegante Verbindung von Silber und Natur"
-    }
-  ];
+  // Gallery images will be loaded from database via admin interface
+  const galleryImages: any[] = [];
 
   const filteredImages = selectedCategory === "all" 
     ? galleryImages 

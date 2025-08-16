@@ -30,7 +30,6 @@ Preferred communication style: Simple, everyday language.
 - **ORM**: Drizzle ORM with PostgreSQL dialect for type-safe database operations
 - **Database**: PostgreSQL (configured for Neon Database via connection string)
 - **Schema**: Well-defined tables for products, courses, orders, course bookings, and commission requests
-- **Development Storage**: In-memory storage implementation for development/testing with fallback to database
 - **Migrations**: Drizzle Kit for database schema migrations
 
 ## Authentication and Authorization
@@ -40,7 +39,7 @@ Preferred communication style: Simple, everyday language.
 
 ## External Dependencies
 - **Database Hosting**: Neon Database (serverless PostgreSQL)
-- **Image Hosting**: External image URLs (currently using Unsplash placeholders)
+- **Image Hosting**: Real product images via database storage and admin interface
 - **Payment Processing**: Stripe integration planned but not yet implemented
 - **Email Service**: No email service currently integrated
 - **Fonts**: Google Fonts for typography (Playfair Display, Inter, Dancing Script)
@@ -48,3 +47,12 @@ Preferred communication style: Simple, everyday language.
 - **Development Tools**: Replit-specific plugins for development environment integration
 
 The architecture follows a clean separation of concerns with shared TypeScript types between frontend and backend, comprehensive error handling, and a scalable component structure. The application is designed for easy deployment and includes proper TypeScript configuration for both client and server code.
+
+## Recent Changes (2025-01-16)
+- **Database Cleanup**: Removed all fake/seed data from the system
+  - Eliminated hardcoded product seeding in `databaseStorage.ts`
+  - Removed `/api/seed-products` route from server
+  - Cleaned up gallery mock images
+  - Updated storage interface to remove seedProducts method
+- **Data Source**: System now exclusively uses PostgreSQL database with real data via admin interface
+- **Product Cards**: Improved layout with wider minimum width (280px) and smaller title text for better readability
