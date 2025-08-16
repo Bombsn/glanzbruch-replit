@@ -181,7 +181,11 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
                   Jetzt buchen
                 </Button>
               </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent 
+              className="sm:max-w-[425px]"
+              onPointerDownOutside={(e) => e.preventDefault()}
+              onInteractOutside={(e) => e.preventDefault()}
+            >
               <DialogHeader>
                 <DialogTitle className="text-forest">Kurs buchen</DialogTitle>
                 <DialogDescription>
