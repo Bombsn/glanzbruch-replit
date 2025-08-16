@@ -250,31 +250,34 @@ const AdminGallery = () => {
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <div className="flex items-center gap-4">
+          <div>
+            <h1 className="font-heading text-4xl font-bold text-forest mb-2" data-testid="heading-admin-gallery">
+              Galerie-Verwaltung
+            </h1>
+            <p className="text-charcoal/70">
+              Verwalten Sie die Bilder in Ihrer Galerie
+            </p>
+          </div>
+          
+          <div className="flex gap-3">
             <Link href="/admin/dashboard">
-              <Button variant="outline" size="sm" className="gap-2">
-                <ArrowLeft className="w-4 h-4" />
+              <Button 
+                variant="outline" 
+                className="border-gold text-gold hover:bg-gold hover:text-white"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
                 Zurück zum Dashboard
               </Button>
             </Link>
-            <div>
-              <h1 className="font-heading text-3xl font-bold text-forest mb-2" data-testid="heading-admin-gallery">
-                Galerie-Verwaltung
-              </h1>
-              <p className="text-charcoal/70">
-                Verwalten Sie die Bilder in Ihrer Galerie
-              </p>
-            </div>
+            <Button 
+              className="bg-forest text-white hover:bg-forest/90" 
+              onClick={() => setShowAddModal(true)}
+              data-testid="button-add-image"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Bild hinzufügen
+            </Button>
           </div>
-          
-          <Button 
-            className="bg-forest text-white hover:bg-forest/90" 
-            onClick={() => setShowAddModal(true)}
-            data-testid="button-add-image"
-          >
-            <Plus className="w-4 h-4 mr-2" />
-            Bild hinzufügen
-          </Button>
         </div>
 
         {/* Stats */}
