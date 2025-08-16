@@ -85,7 +85,7 @@ const Home = () => {
             />
           </div>
 
-          <h1 className="font-logo text-4xl md:text-6xl lg:text-7xl text-white mb-6 leading-tight">
+          <h1 className="font-logo md:text-6xl lg:text-7xl text-white mb-6 text-[94px]">
             Wald- und Wiesenschmuck
           </h1>
 
@@ -120,7 +120,6 @@ const Home = () => {
           <ChevronDown className="w-8 h-8" />
         </div>
       </section>
-
       {/* Brand Story */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
@@ -157,7 +156,6 @@ const Home = () => {
           </div>
         </div>
       </section>
-
       {/* Featured Products */}
       <section className="py-16 bg-cream">
         <div className="container mx-auto px-4">
@@ -193,7 +191,6 @@ const Home = () => {
           </div>
         </div>
       </section>
-
       {/* Courses Section */}
       {featuredCourseType && (
         <section className="py-16 bg-white">
@@ -279,7 +276,6 @@ const Home = () => {
           </div>
         </section>
       )}
-
       {/* Special Commissions */}
       <section className="py-16 bg-cream">
         <div className="container mx-auto px-4">
@@ -362,7 +358,6 @@ const Home = () => {
           </div>
         </div>
       </section>
-
       {/* Testimonials */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
@@ -435,7 +430,6 @@ const Home = () => {
           </div>
         </div>
       </section>
-
       {/* Newsletter */}
       <section className="py-16 bg-gradient-to-r from-forest to-sage">
         <div className="container mx-auto px-4">
