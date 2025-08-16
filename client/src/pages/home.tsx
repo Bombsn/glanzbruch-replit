@@ -136,7 +136,7 @@ const Home = () => {
                 Wiesen entstehen in meinem Atelier zauberhafte Schmuckstücke,
                 die wie aus einer anderen Welt stammen.
               </p>
-              <p className="mb-6 text-[20px]">
+              <p className="text-[20px] mt-[12px] mb-[12px]">
                 Hier vereinen sich Kunstharz, Silber und Bronze zu einem
                 glanzvollen Ausdruck von Natur und Erinnerungen. Jede Kreation
                 ist ein kleines Stück Märchen, das die verborgenen Geschichten
