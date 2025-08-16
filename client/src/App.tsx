@@ -14,6 +14,7 @@ import Contact from "@/pages/contact";
 import ProductPage from "@/pages/product";
 import AdminLogin from "@/pages/admin-login";
 import AdminDashboard from "@/pages/admin-dashboard";
+import AdminGallery from "@/pages/admin-gallery";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import ShoppingCart from "@/components/shopping-cart";
@@ -30,6 +31,7 @@ function Router() {
       <Route path="/produkt/:id" component={ProductPage} />
       <Route path="/admin" component={AdminLogin} />
       <Route path="/admin/dashboard" component={AdminDashboard} />
+      <Route path="/admin/gallery" component={AdminGallery} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -49,6 +51,9 @@ function App() {
               <Router />
             </Route>
             <Route path="/admin/dashboard">
+              <Router />
+            </Route>
+            <Route path="/admin/gallery">
               <Router />
             </Route>
             <Route>

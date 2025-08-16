@@ -13,6 +13,8 @@ import {
   type InsertCommissionRequest,
   type Admin,
   type InsertAdmin,
+  type GalleryImage,
+  type InsertGalleryImage,
   type CourseWithType,
   products,
   courses,
@@ -20,10 +22,11 @@ import {
   orders,
   courseBookings,
   commissionRequests,
-  admins
+  admins,
+  galleryImages
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, sql } from "drizzle-orm";
+import { eq, sql, asc, and } from "drizzle-orm";
 import type { IStorage } from "./storage";
 
 export class DatabaseStorage implements IStorage {
@@ -211,5 +214,34 @@ export class DatabaseStorage implements IStorage {
   async createAdmin(admin: InsertAdmin): Promise<Admin> {
     const [newAdmin] = await db.insert(admins).values(admin).returning();
     return newAdmin;
+  }
+
+  // Gallery Images
+  async getGalleryImages(): Promise<GalleryImage[]> {
+    return await db.select().from(galleryImages).where(eq(galleryImages.isVisible, true)).orderBy(asc(galleryImages.sortOrder), asc(galleryImages.createdAt));
+  }
+
+  async getGalleryImagesByCategory(category: string): Promise<GalleryImage[]> {
+    return await db.select().from(galleryImages)
+      .where(and(eq(galleryImages.category, category), eq(galleryImages.isVisible, true)))
+      .orderBy(asc(galleryImages.sortOrder), asc(galleryImages.createdAt));
+  }
+
+  async createGalleryImage(image: InsertGalleryImage): Promise<GalleryImage> {
+    const [newImage] = await db.insert(galleryImages).values(image).returning();
+    return newImage;
+  }
+
+  async updateGalleryImage(id: string, image: Partial<InsertGalleryImage>): Promise<GalleryImage | undefined> {
+    const [updatedImage] = await db.update(galleryImages)
+      .set(image)
+      .where(eq(galleryImages.id, id))
+      .returning();
+    return updatedImage || undefined;
+  }
+
+  async deleteGalleryImage(id: string): Promise<boolean> {
+    const result = await db.delete(galleryImages).where(eq(galleryImages.id, id));
+    return (result.rowCount || 0) > 0;
   }
 }

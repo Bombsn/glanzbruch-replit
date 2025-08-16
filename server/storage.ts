@@ -13,6 +13,8 @@ import {
   type InsertCommissionRequest,
   type Admin,
   type InsertAdmin,
+  type GalleryImage,
+  type InsertGalleryImage,
   type CourseWithType,
 } from "@shared/schema";
 import { DatabaseStorage } from "./databaseStorage";
@@ -60,6 +62,13 @@ export interface IStorage {
   // Admin methods
   getAdminByUsername(username: string): Promise<Admin | undefined>;
   createAdmin(admin: InsertAdmin): Promise<Admin>;
+  
+  // Gallery Images
+  getGalleryImages(): Promise<GalleryImage[]>;
+  getGalleryImagesByCategory(category: string): Promise<GalleryImage[]>;
+  createGalleryImage(image: InsertGalleryImage): Promise<GalleryImage>;
+  updateGalleryImage(id: string, image: Partial<InsertGalleryImage>): Promise<GalleryImage | undefined>;
+  deleteGalleryImage(id: string): Promise<boolean>;
 }
 
 // Use database storage

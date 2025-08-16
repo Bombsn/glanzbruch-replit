@@ -2,20 +2,24 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Eye, Heart, Star } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import type { GalleryImage } from "@shared/schema";
 
 const Gallery = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
 
   const categories = [
     { id: "all", name: "Alle Bilder", description: "Komplette Sammlung" },
-    { id: "silver-bronze", name: "Silber und Bronze", description: "Edle Metallarbeiten" },
-    { id: "nature", name: "Haare, Asche, Blüten", description: "Besondere Erinnerungsstücke" },
-    { id: "resin", name: "Kunstharz", description: "UV-Resin Kreationen" },
-    { id: "worn", name: "Tragebilder", description: "Schmuck in Aktion" },
+    { id: "Silber und Bronze", name: "Silber und Bronze", description: "Edle Metallarbeiten" },
+    { id: "Haare, Asche, Blüten, etc.", name: "Haare, Asche, Blüten", description: "Besondere Erinnerungsstücke" },
+    { id: "Kunstharz", name: "Kunstharz", description: "UV-Resin Kreationen" },
+    { id: "Tragebilder", name: "Tragebilder", description: "Schmuck in Aktion" },
   ];
 
-  // Gallery images will be loaded from database via admin interface
-  const galleryImages: any[] = [];
+  // Load gallery images from API
+  const { data: galleryImages = [], isLoading } = useQuery<GalleryImage[]>({
+    queryKey: ['/api/gallery'],
+  });
 
   const filteredImages = selectedCategory === "all" 
     ? galleryImages 
@@ -66,8 +70,13 @@ const Gallery = () => {
           </div>
         </div>
 
-        {/* Image Grid */}
-        {filteredImages.length === 0 ? (
+        {/* Loading State */}
+        {isLoading ? (
+          <div className="text-center py-16">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-forest"></div>
+            <p className="mt-4 text-charcoal">Galerie wird geladen...</p>
+          </div>
+        ) : filteredImages.length === 0 ? (
           <div className="text-center py-16">
             <Eye className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <p className="text-xl text-charcoal mb-4">Keine Bilder in dieser Kategorie verfügbar.</p>
@@ -86,8 +95,8 @@ const Gallery = () => {
               <Card key={image.id} className="group overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
                 <div className="relative overflow-hidden">
                   <img
-                    src={image.src}
-                    alt={image.alt}
+                    src={image.imageUrl}
+                    alt={image.altText}
                     className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110"
                     data-testid={`gallery-image-${image.id}`}
                   />
@@ -109,9 +118,11 @@ const Gallery = () => {
                   <h3 className="font-heading text-lg font-semibold text-forest mb-2" data-testid={`image-title-${image.id}`}>
                     {image.title}
                   </h3>
-                  <p className="text-sm text-charcoal/70" data-testid={`image-description-${image.id}`}>
-                    {image.description}
-                  </p>
+                  {image.description && (
+                    <p className="text-sm text-charcoal/70" data-testid={`image-description-${image.id}`}>
+                      {image.description}
+                    </p>
+                  )}
                 </CardContent>
               </Card>
             ))}

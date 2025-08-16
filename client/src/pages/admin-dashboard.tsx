@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, Clock, Users, Plus, Edit, Trash2, LogOut, Home as HomeIcon, Package, BookOpen, ShoppingBag } from "lucide-react";
+import { Calendar, Clock, Users, Plus, Edit, Trash2, LogOut, Home as HomeIcon, Package, BookOpen, ShoppingBag, Image as ImageIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertCourseSchema, type CourseType, type CourseWithType, type InsertCourse, type Product } from "@shared/schema";
@@ -294,7 +294,7 @@ const AdminDashboard = () => {
 
         {/* Tabs Navigation */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="overview" className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
               Übersicht
@@ -306,6 +306,10 @@ const AdminDashboard = () => {
             <TabsTrigger value="courses" className="flex items-center gap-2">
               <BookOpen className="w-4 h-4" />
               Kurse
+            </TabsTrigger>
+            <TabsTrigger value="gallery" className="flex items-center gap-2">
+              <ImageIcon className="w-4 h-4" />
+              Galerie
             </TabsTrigger>
           </TabsList>
 
@@ -899,6 +903,41 @@ const AdminDashboard = () => {
           </DialogContent>
         </Dialog>
 
+          </TabsContent>
+
+          {/* Gallery Tab */}
+          <TabsContent value="gallery" className="space-y-6">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between">
+                <CardTitle>Galerie-Verwaltung</CardTitle>
+                <Button
+                  onClick={() => setLocation("/admin/gallery")}
+                  className="bg-forest hover:bg-forest/90 text-white"
+                >
+                  <ImageIcon className="w-4 h-4 mr-2" />
+                  Galerie öffnen
+                </Button>
+              </CardHeader>
+              
+              <CardContent>
+                <div className="text-center py-12">
+                  <ImageIcon className="w-16 h-16 text-sage mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-forest mb-2">
+                    Galerie-Verwaltung
+                  </h3>
+                  <p className="text-charcoal/70 mb-6 max-w-md mx-auto">
+                    Verwalten Sie Ihre Galerie-Bilder in der erweiterten Galerie-Verwaltung mit erweiterten Funktionen wie Upload, Bearbeitung und Kategorisierung.
+                  </p>
+                  <Button
+                    onClick={() => setLocation("/admin/gallery")}
+                    className="bg-forest hover:bg-forest/90 text-white"
+                  >
+                    <ImageIcon className="w-4 h-4 mr-2" />
+                    Galerie-Verwaltung öffnen
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
 

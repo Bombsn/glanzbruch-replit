@@ -100,6 +100,18 @@ export const commissionRequests = pgTable("commission_requests", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const galleryImages = pgTable("gallery_images", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  imageUrl: text("image_url").notNull(),
+  title: text("title").notNull(),
+  description: text("description"),
+  category: text("category").notNull(), // "silver-bronze", "nature", "resin", "worn"
+  altText: text("alt_text").notNull(),
+  sortOrder: integer("sort_order").default(0),
+  isVisible: boolean("is_visible").default(true),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 export const insertProductSchema = createInsertSchema(products).omit({
   id: true,
   createdAt: true,
@@ -135,6 +147,11 @@ export const insertAdminSchema = createInsertSchema(admins).omit({
   createdAt: true,
 });
 
+export const insertGalleryImageSchema = createInsertSchema(galleryImages).omit({
+  id: true,
+  createdAt: true,
+});
+
 export type InsertProduct = z.infer<typeof insertProductSchema>;
 export type Product = typeof products.$inferSelect;
 
@@ -155,6 +172,9 @@ export type CommissionRequest = typeof commissionRequests.$inferSelect;
 
 export type InsertAdmin = z.infer<typeof insertAdminSchema>;
 export type Admin = typeof admins.$inferSelect;
+
+export type InsertGalleryImage = z.infer<typeof insertGalleryImageSchema>;
+export type GalleryImage = typeof galleryImages.$inferSelect;
 
 // Extended types for course with course type information
 export interface CourseWithType extends Course {
