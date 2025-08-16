@@ -51,7 +51,7 @@ const AdminDashboard = () => {
     enabled: isAuthenticated,
   });
 
-  const { data: courseBookings = [] } = useQuery({
+  const { data: courseBookings = [] } = useQuery<any[]>({
     queryKey: ["/api/course-bookings"],
     enabled: isAuthenticated,
   });

@@ -616,7 +616,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       });
     } catch (error) {
-      res.status(500).json({ error: error.message, stack: error.stack });
+      const err = error as Error;
+      res.status(500).json({ error: err.message, stack: err.stack });
     }
   });
 

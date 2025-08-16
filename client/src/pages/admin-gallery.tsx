@@ -269,7 +269,7 @@ const AdminGallery = () => {
     setShowEditModal(true);
   };
 
-  const handleGetUploadParameters = async (file: any) => {
+  const handleGetUploadParameters = async () => {
     const response = await apiRequest("/api/objects/upload", "POST");
     const data = await response.json();
     
