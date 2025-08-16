@@ -122,9 +122,11 @@ const Courses = () => {
               </p>
             </div>
           ) : (
-            <div className="space-y-8">
-              {courses.map((course) => (
-                <CourseInstanceCard key={course.id} course={course} />
+            <div>
+              {courses.map((course, index) => (
+                <div key={course.id} className={index > 0 ? "mt-8" : ""}>
+                  <CourseInstanceCard course={course} />
+                </div>
               ))}
             </div>
           )}
