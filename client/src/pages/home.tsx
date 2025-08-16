@@ -18,6 +18,7 @@ import { apiRequest } from "@/lib/queryClient";
 import { useState } from "react";
 import ProductCard from "@/components/product-card";
 import type { Product, CourseType } from "@shared/schema";
+import heroBackgroundImage from "@assets/hero_gb_1755361760256.jpg";
 
 const Home = () => {
   const { toast } = useToast();
@@ -69,7 +70,7 @@ const Home = () => {
           className="absolute inset-0 bg-gradient-to-br from-forest/80 to-sage/60"
           style={{
             backgroundImage:
-              "url('/attached_assets/hero_gb_1755361760256.jpg')",
+              `url(${heroBackgroundImage})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
             filter:
@@ -78,15 +79,6 @@ const Home = () => {
         />
 
         <div className="relative z-10 text-center max-w-4xl mx-auto px-4">
-          {/* Workshop Banner */}
-          <div className="mb-8 inline-block">
-            <img
-              src="https://image.jimcdn.com/app/cms/image/transf/dimension=291x10000:format=jpg/path/s10438f9ff8ed1fb7/image/i0ce22cb0aab24021/version/1730743747/image.jpg"
-              alt="Glanzbruch Workshop Schmuck Metall"
-              className="rounded-xl shadow-lg mx-auto max-w-xs md:max-w-sm"
-            />
-          </div>
-
           <h1 className="font-logo md:text-6xl lg:text-7xl text-white mb-6 text-[94px]">
             Wald- und Wiesenschmuck
           </h1>
