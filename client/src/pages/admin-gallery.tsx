@@ -246,7 +246,7 @@ const AdminGallery = () => {
   const selectedCategoryName = categories.find(cat => cat.id === formData.category)?.name || formData.category;
 
   return (
-    <div className="min-h-screen bg-cream py-8">
+    <div className="min-h-screen bg-cream py-16">
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
