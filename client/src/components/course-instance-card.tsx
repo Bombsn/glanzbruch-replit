@@ -171,7 +171,11 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
               <DialogTrigger asChild>
                 <Button 
                   className="bg-gold hover:bg-gold/90 text-white"
-                  onClick={(e) => e.stopPropagation()}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsDialogOpen(true);
+                  }}
                   data-testid={`button-book-course-${course.id}`}
                 >
                   Jetzt buchen

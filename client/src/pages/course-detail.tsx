@@ -1,13 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRoute, Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
@@ -51,16 +52,23 @@ const CourseDetailPage = () => {
       customerName: "",
       customerEmail: "",
       customerPhone: "",
+      participants: 1,
       totalPrice: course?.courseType.price || "0",
       message: "",
     },
   });
 
-  // Update form when course data is loaded
-  if (course && form.getValues().totalPrice !== course.courseType.price) {
-    form.setValue("totalPrice", course.courseType.price);
-    form.setValue("courseId", course.id);
-  }
+  // Watch participants field to calculate total price
+  const participants = form.watch("participants") || 1;
+  
+  useEffect(() => {
+    if (course) {
+      const basePrice = parseFloat(course.courseType.price);
+      const totalPrice = (basePrice * participants).toFixed(2);
+      form.setValue("totalPrice", totalPrice);
+      form.setValue("courseId", course.id);
+    }
+  }, [participants, course, form]);
 
   const bookingMutation = useMutation({
     mutationFn: (data: BookingFormData) => apiRequest("POST", "/api/course-bookings", data),
@@ -233,6 +241,9 @@ const CourseDetailPage = () => {
               <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
                   <DialogTitle className="text-forest">Kurs buchen</DialogTitle>
+                  <DialogDescription>
+                    Füllen Sie das Formular aus, um eine Buchungsanfrage zu senden.
+                  </DialogDescription>
                 </DialogHeader>
                 
                 <div className="mb-4">
@@ -298,6 +309,49 @@ const CourseDetailPage = () => {
                         </FormItem>
                       )}
                     />
+                    
+                    <FormField
+                      control={form.control}
+                      name="participants"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Anzahl Teilnehmer *</FormLabel>
+                          <Select 
+                            onValueChange={(value) => field.onChange(parseInt(value))} 
+                            value={field.value?.toString() || "1"}
+                          >
+                            <FormControl>
+                              <SelectTrigger data-testid="select-participants">
+                                <SelectValue placeholder="1 Person" />
+                              </SelectTrigger>
+                            </FormControl>
+                            <SelectContent>
+                              {Array.from({ length: Math.min(course.availableSpots, 8) }, (_, i) => i + 1).map((num) => (
+                                <SelectItem key={num} value={num.toString()}>
+                                  {num} {num === 1 ? 'Person' : 'Personen'}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <FormMessage />
+                          <p className="text-xs text-charcoal/60">
+                            Verfügbar: {course.availableSpots} Plätze
+                          </p>
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Display total price */}
+                    <div className="p-3 bg-sage/10 rounded-lg border border-sage/20">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-charcoal/70">
+                          Gesamtpreis ({participants} {participants === 1 ? 'Person' : 'Personen'}):
+                        </span>
+                        <span className="text-lg font-bold text-forest" data-testid="total-price-display">
+                          {formatPrice((parseFloat(course.courseType.price) * participants).toFixed(2))}
+                        </span>
+                      </div>
+                    </div>
                     
                     <FormField
                       control={form.control}
