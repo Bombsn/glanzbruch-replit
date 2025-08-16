@@ -82,18 +82,6 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
     return time;
   };
 
-  const formatDuration = (minutes: number) => {
-    const hours = Math.floor(minutes / 60);
-    const remainingMinutes = minutes % 60;
-    if (hours > 0 && remainingMinutes > 0) {
-      return `${hours}h ${remainingMinutes}min`;
-    } else if (hours > 0) {
-      return `${hours}h`;
-    } else {
-      return `${remainingMinutes}min`;
-    }
-  };
-
   return (
     <Card className="overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300">
       <div className="flex">
@@ -141,14 +129,12 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
                 </span>
               </div>
 
-              {course.courseType.duration && (
-                <div className="flex items-center">
-                  <Star className="w-4 h-4 mr-2 text-gold" />
-                  <span data-testid={`course-duration-${course.id}`}>
-                    {formatDuration(typeof course.courseType.duration === 'number' ? course.courseType.duration : 0)}
-                  </span>
-                </div>
-              )}
+              <div className="flex items-center">
+                <Star className="w-4 h-4 mr-2 text-gold" />
+                <span data-testid={`course-category-${course.id}`}>
+                  {course.courseType.name}
+                </span>
+              </div>
 
               {course.location && (
                 <div className="flex items-center md:col-span-2">
