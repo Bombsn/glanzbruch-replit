@@ -181,15 +181,16 @@ const AdminGallery = () => {
     try {
       console.log("Getting upload parameters for file:", file);
       const response = await apiRequest("/api/objects/upload", "POST");
-      console.log("Upload response received:", response);
+      const data = await response.json();
+      console.log("Upload response received:", data);
       
-      if (!response.uploadURL) {
+      if (!data.uploadURL) {
         throw new Error("No uploadURL in response");
       }
       
       const result = {
         method: "PUT" as const,
-        url: response.uploadURL,
+        url: data.uploadURL,
       };
       console.log("Returning upload parameters:", result);
       return result;
