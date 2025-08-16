@@ -90,13 +90,13 @@ const Gallery = () => {
             </Button>
           </div>
         ) : (
-          <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-0 space-y-0">
+          <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-0">
             {filteredImages.map((image) => (
-              <div key={image.id} className="group relative break-inside-avoid inline-block w-full">
+              <div key={image.id} className="group relative break-inside-avoid block w-full mb-0">
                 <img
                   src={image.imageUrl}
                   alt={image.altText}
-                  className="w-full h-auto object-cover transition-all duration-300 group-hover:brightness-75"
+                  className="w-full h-auto object-cover transition-all duration-300 group-hover:brightness-75 block"
                   data-testid={`gallery-image-${image.id}`}
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
