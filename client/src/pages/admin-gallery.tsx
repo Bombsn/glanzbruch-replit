@@ -177,12 +177,26 @@ const AdminGallery = () => {
     addImageMutation.mutate(formData);
   };
 
-  const handleGetUploadParameters = async () => {
-    const response = await apiRequest("/api/objects/upload", "POST");
-    return {
-      method: "PUT" as const,
-      url: response.uploadURL,
-    };
+  const handleGetUploadParameters = async (file: any) => {
+    try {
+      console.log("Getting upload parameters for file:", file);
+      const response = await apiRequest("/api/objects/upload", "POST");
+      console.log("Upload response received:", response);
+      
+      if (!response.uploadURL) {
+        throw new Error("No uploadURL in response");
+      }
+      
+      const result = {
+        method: "PUT" as const,
+        url: response.uploadURL,
+      };
+      console.log("Returning upload parameters:", result);
+      return result;
+    } catch (error) {
+      console.error("Failed to get upload parameters:", error);
+      throw error;
+    }
   };
 
   const handleUploadComplete = (result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
