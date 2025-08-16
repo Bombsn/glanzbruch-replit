@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import { Eye, Heart, Star, X, ChevronLeft, ChevronRight } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import type { GalleryImage } from "@shared/schema";
@@ -198,9 +199,12 @@ const Gallery = () => {
         {/* Lightbox Modal */}
         <Dialog open={isLightboxOpen} onOpenChange={setIsLightboxOpen}>
           <DialogContent 
-            className="max-w-[95vw] max-h-[95vh] w-auto h-auto p-0 bg-black/95 border-none"
+            className="max-w-[98vw] max-h-[98vh] w-[98vw] h-[98vh] p-0 bg-black/95 border-none"
             onKeyDown={handleKeyPress}
           >
+            <VisuallyHidden>
+              <DialogTitle>Bildergalerie - Vergrößerte Ansicht</DialogTitle>
+            </VisuallyHidden>
             <div className="relative w-full h-full flex items-center justify-center">
               {/* Close Button */}
               <Button
@@ -241,25 +245,25 @@ const Gallery = () => {
 
               {/* Image */}
               {selectedImageIndex !== null && filteredImages[selectedImageIndex] && (
-                <div className="flex flex-col items-center justify-center max-w-full max-h-full p-8">
+                <div className="flex flex-col items-center justify-center w-full h-full p-4">
                   <img
                     src={filteredImages[selectedImageIndex].imageUrl}
                     alt={filteredImages[selectedImageIndex].altText}
-                    className="max-w-full max-h-[80vh] object-contain rounded-lg shadow-2xl"
+                    className="max-w-full max-h-[85vh] object-contain rounded-lg shadow-2xl"
                     data-testid={`lightbox-image-${filteredImages[selectedImageIndex].id}`}
                   />
                   
                   {/* Image Info */}
-                  <div className="text-center mt-6 text-white max-w-2xl">
-                    <h3 className="text-xl font-semibold mb-2">
+                  <div className="text-center mt-4 text-white max-w-4xl">
+                    <h3 className="text-2xl font-semibold mb-2">
                       {filteredImages[selectedImageIndex].title}
                     </h3>
                     {filteredImages[selectedImageIndex].description && (
-                      <p className="text-gray-300 text-sm">
+                      <p className="text-gray-300 text-base mb-2">
                         {filteredImages[selectedImageIndex].description}
                       </p>
                     )}
-                    <p className="text-gray-400 text-xs mt-2">
+                    <p className="text-gray-400 text-sm">
                       Bild {selectedImageIndex + 1} von {filteredImages.length}
                     </p>
                   </div>
