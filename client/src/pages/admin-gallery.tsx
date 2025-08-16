@@ -39,12 +39,13 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { GalleryImage } from "@shared/schema";
+import type { UploadResult } from "@uppy/core";
 import { apiRequest } from "@/lib/queryClient";
+import { ObjectUploader } from "@/components/ObjectUploader";
 
 const AdminGallery = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [showAddModal, setShowAddModal] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
   const [open, setOpen] = useState(false);
   const [formData, setFormData] = useState({
     imageUrl: "",
@@ -168,12 +169,66 @@ const AdminGallery = () => {
     if (!formData.imageUrl || !formData.title || !formData.category || !formData.altText) {
       toast({
         title: "Fehlende Angaben",
-        description: "Bitte füllen Sie alle Pflichtfelder aus.",
+        description: "Bitte füllen Sie alle Pflichtfelder aus (Bild, Titel, Kategorie, Alt-Text).",
         variant: "destructive",
       });
       return;
     }
     addImageMutation.mutate(formData);
+  };
+
+  const handleGetUploadParameters = async () => {
+    const response = await apiRequest("/api/objects/upload", "POST");
+    return {
+      method: "PUT" as const,
+      url: response.uploadURL,
+    };
+  };
+
+  const handleUploadComplete = (result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
+    if (result.successful && result.successful[0]) {
+      const uploadedFile = result.successful[0];
+      const uploadURL = uploadedFile.uploadURL as string;
+      
+      // Convert GCS URL to object path
+      const objectPath = convertUploadURLToObjectPath(uploadURL);
+      
+      // Update form data with the object path
+      setFormData(prev => ({
+        ...prev,
+        imageUrl: objectPath,
+      }));
+      
+      toast({
+        title: "Upload erfolgreich",
+        description: "Das Bild wurde erfolgreich hochgeladen. Füllen Sie nun die weiteren Details aus.",
+      });
+    } else {
+      toast({
+        title: "Upload fehlgeschlagen",
+        description: "Das Bild konnte nicht hochgeladen werden.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const convertUploadURLToObjectPath = (uploadURL: string): string => {
+    try {
+      const url = new URL(uploadURL);
+      const pathParts = url.pathname.split('/');
+      
+      // Find the part after .private/gallery/
+      const privateIndex = pathParts.findIndex(part => part === '.private');
+      if (privateIndex !== -1 && pathParts[privateIndex + 1] === 'gallery') {
+        const objectId = pathParts[privateIndex + 2];
+        return `/objects/gallery/${objectId}`;
+      }
+      
+      // Fallback: use the original URL
+      return uploadURL;
+    } catch {
+      return uploadURL;
+    }
   };
 
   // Get unique categories from existing images
@@ -354,18 +409,23 @@ const AdminGallery = () => {
             </DialogHeader>
             
             <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="imageUrl">Bild-URL *</Label>
-                  <Input
-                    id="imageUrl"
-                    placeholder="https://..."
-                    value={formData.imageUrl}
-                    onChange={(e) => setFormData(prev => ({ ...prev, imageUrl: e.target.value }))}
-                    data-testid="input-image-url"
-                  />
+              <div>
+                <Label>Bild hochladen *</Label>
+                <div className="mt-2">
+                  <ObjectUploader
+                    maxNumberOfFiles={1}
+                    maxFileSize={10485760}
+                    onGetUploadParameters={handleGetUploadParameters}
+                    onComplete={handleUploadComplete}
+                    buttonClassName="w-full bg-forest hover:bg-forest/90 text-white"
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    {formData.imageUrl ? "Anderes Bild hochladen" : "Bild auswählen und hochladen"}
+                  </ObjectUploader>
                 </div>
-                
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="title">Titel *</Label>
                   <Input
@@ -374,6 +434,17 @@ const AdminGallery = () => {
                     value={formData.title}
                     onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                     data-testid="input-title"
+                  />
+                </div>
+                
+                <div>
+                  <Label htmlFor="altText">Alt-Text *</Label>
+                  <Input
+                    id="altText"
+                    placeholder="Beschreibung für Screenreader"
+                    value={formData.altText}
+                    onChange={(e) => setFormData(prev => ({ ...prev, altText: e.target.value }))}
+                    data-testid="input-alt-text"
                   />
                 </div>
               </div>
@@ -389,71 +460,58 @@ const AdminGallery = () => {
                 />
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="category">Kategorie *</Label>
-                  <Popover open={open} onOpenChange={setOpen}>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        role="combobox"
-                        aria-expanded={open}
-                        className="w-full justify-between"
-                        data-testid="button-category-select"
-                      >
-                        {selectedCategoryName || "Kategorie wählen..."}
-                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-full p-0">
-                      <Command>
-                        <CommandInput 
-                          placeholder="Kategorie suchen oder neue eingeben..." 
-                          value={formData.category}
-                          onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
-                        />
-                        <CommandEmpty>
-                          Drücken Sie Enter um "{formData.category}" als neue Kategorie hinzuzufügen.
-                        </CommandEmpty>
-                        <CommandGroup>
-                          {allCategoryOptions.map((categoryId) => {
-                            const categoryName = categories.find(cat => cat.id === categoryId)?.name || categoryId;
-                            return (
-                              <CommandItem
-                                key={categoryId}
-                                value={categoryId}
-                                onSelect={(currentValue) => {
-                                  setFormData(prev => ({ ...prev, category: currentValue }));
-                                  setOpen(false);
-                                }}
-                                data-testid={`option-category-${categoryId}`}
-                              >
-                                <Check
-                                  className={cn(
-                                    "mr-2 h-4 w-4",
-                                    formData.category === categoryId ? "opacity-100" : "opacity-0"
-                                  )}
-                                />
-                                {categoryName}
-                              </CommandItem>
-                            );
-                          })}
-                        </CommandGroup>
-                      </Command>
-                    </PopoverContent>
-                  </Popover>
-                </div>
-                
-                <div>
-                  <Label htmlFor="altText">Alt-Text *</Label>
-                  <Input
-                    id="altText"
-                    placeholder="Beschreibung für Screenreader"
-                    value={formData.altText}
-                    onChange={(e) => setFormData(prev => ({ ...prev, altText: e.target.value }))}
-                    data-testid="input-alt-text"
-                  />
-                </div>
+              <div>
+                <Label htmlFor="category">Kategorie *</Label>
+                <Popover open={open} onOpenChange={setOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      role="combobox"
+                      aria-expanded={open}
+                      className="w-full justify-between mt-2"
+                      data-testid="button-category-select"
+                    >
+                      {selectedCategoryName || "Kategorie wählen..."}
+                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-full p-0">
+                    <Command>
+                      <CommandInput 
+                        placeholder="Kategorie suchen oder neue eingeben..." 
+                        value={formData.category}
+                        onValueChange={(value) => setFormData(prev => ({ ...prev, category: value }))}
+                      />
+                      <CommandEmpty>
+                        Drücken Sie Enter um "{formData.category}" als neue Kategorie hinzuzufügen.
+                      </CommandEmpty>
+                      <CommandGroup>
+                        {allCategoryOptions.map((categoryId) => {
+                          const categoryName = categories.find(cat => cat.id === categoryId)?.name || categoryId;
+                          return (
+                            <CommandItem
+                              key={categoryId}
+                              value={categoryId}
+                              onSelect={(currentValue) => {
+                                setFormData(prev => ({ ...prev, category: currentValue }));
+                                setOpen(false);
+                              }}
+                              data-testid={`option-category-${categoryId}`}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  formData.category === categoryId ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                              {categoryName}
+                            </CommandItem>
+                          );
+                        })}
+                      </CommandGroup>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
               </div>
 
               {/* Image Preview */}

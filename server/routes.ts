@@ -1,6 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { ObjectStorageService } from "./objectStorage";
 import crypto from "crypto";
 import { 
   insertProductSchema,
@@ -479,7 +480,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
 
       // Category mappings from German to our internal categories
-      const categoryMapping = {
+      const categoryMapping: Record<string, string> = {
         'silver-bronze': 'Silber und Bronze',
         'nature': 'Haare, Asche, Blüten, etc.',
         'resin': 'Kunstharz',
@@ -507,7 +508,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             await storage.createGalleryImage(galleryImage);
             totalImported++;
           } catch (error) {
-            console.error(`Failed to import image ${i + 1} from ${category}:`, error.message);
+            console.error(`Failed to import image ${i + 1} from ${category}:`, (error as Error).message);
           }
         }
       }
@@ -525,7 +526,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Gallery import failed:", error);
-      res.status(500).json({ message: "Gallery import failed", error: error.message });
+      res.status(500).json({ message: "Gallery import failed", error: (error as Error).message });
+    }
+  });
+
+  // Object Storage Routes for Gallery Images
+  app.post("/api/objects/upload", async (req, res) => {
+    try {
+      const objectStorageService = new ObjectStorageService();
+      const uploadURL = await objectStorageService.getObjectEntityUploadURL();
+      res.json({ uploadURL });
+    } catch (error) {
+      console.error("Failed to get upload URL:", error);
+      res.status(500).json({ message: "Failed to get upload URL" });
+    }
+  });
+
+  // Serve objects from storage
+  app.get("/objects/:objectPath(*)", async (req, res) => {
+    try {
+      const objectStorageService = new ObjectStorageService();
+      const objectFile = await objectStorageService.getObjectEntityFile(req.path);
+      objectStorageService.downloadObject(objectFile, res);
+    } catch (error) {
+      console.error("Error serving object:", error);
+      res.status(404).json({ error: "Object not found" });
     }
   });
 

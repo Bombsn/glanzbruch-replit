@@ -64,6 +64,7 @@ export function ObjectUploader({
       restrictions: {
         maxNumberOfFiles,
         maxFileSize,
+        allowedFileTypes: ['image/*'], // Only allow images for gallery
       },
       autoProceed: false,
     })
@@ -73,6 +74,7 @@ export function ObjectUploader({
       })
       .on("complete", (result) => {
         onComplete?.(result);
+        setShowModal(false);
       })
   );
 
@@ -87,6 +89,36 @@ export function ObjectUploader({
         open={showModal}
         onRequestClose={() => setShowModal(false)}
         proudlyDisplayPoweredByUppy={false}
+        locale={{
+          strings: {
+            closeModal: 'Modal schließen',
+            importFrom: 'Importieren von %{name}',
+            addingMoreFiles: 'Weitere Dateien hinzufügen',
+            addMoreFiles: 'Weitere Dateien hinzufügen',
+            dashboardWindowTitle: 'Datei-Upload Dashboard',
+            dashboardTitle: 'Datei-Upload',
+            dropPasteFiles: 'Dateien hier ablegen, einfügen oder %{browseFiles}',
+            browseFiles: 'durchsuchen',
+            uploadComplete: 'Upload abgeschlossen',
+            uploadPaused: 'Upload pausiert',
+            resumeUpload: 'Upload fortsetzen',
+            pauseUpload: 'Upload pausieren',
+            retryUpload: 'Upload wiederholen',
+            cancelUpload: 'Upload abbrechen',
+            xFilesSelected: {
+              0: '%{smart_count} Datei ausgewählt',
+              1: '%{smart_count} Dateien ausgewählt',
+            },
+            uploadingXFiles: {
+              0: '%{smart_count} Datei wird hochgeladen',
+              1: '%{smart_count} Dateien werden hochgeladen',
+            },
+            processingXFiles: {
+              0: '%{smart_count} Datei wird verarbeitet',
+              1: '%{smart_count} Dateien werden verarbeitet',
+            },
+          },
+        }}
       />
     </div>
   );
