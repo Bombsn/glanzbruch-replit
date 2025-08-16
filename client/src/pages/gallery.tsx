@@ -90,41 +90,28 @@ const Gallery = () => {
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-0 space-y-0">
             {filteredImages.map((image) => (
-              <Card key={image.id} className="group overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
-                <div className="relative overflow-hidden">
-                  <img
-                    src={image.imageUrl}
-                    alt={image.altText}
-                    className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110"
-                    data-testid={`gallery-image-${image.id}`}
-                  />
-                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <Button
-                        size="sm"
-                        className="bg-white/90 text-forest hover:bg-white"
-                        data-testid={`button-view-image-${image.id}`}
-                      >
-                        <Eye className="w-4 h-4 mr-2" />
-                        Ansehen
-                      </Button>
-                    </div>
+              <div key={image.id} className="group relative break-inside-avoid inline-block w-full">
+                <img
+                  src={image.imageUrl}
+                  alt={image.altText}
+                  className="w-full h-auto object-cover transition-all duration-300 group-hover:brightness-75"
+                  data-testid={`gallery-image-${image.id}`}
+                />
+                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 flex items-center justify-center">
+                  <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <Button
+                      size="sm"
+                      className="bg-white/90 text-forest hover:bg-white"
+                      data-testid={`button-view-image-${image.id}`}
+                    >
+                      <Eye className="w-4 h-4 mr-2" />
+                      Ansehen
+                    </Button>
                   </div>
                 </div>
-                
-                <CardContent className="p-4">
-                  <h3 className="font-heading text-lg font-semibold text-forest mb-2" data-testid={`image-title-${image.id}`}>
-                    {image.title}
-                  </h3>
-                  {image.description && (
-                    <p className="text-sm text-charcoal/70" data-testid={`image-description-${image.id}`}>
-                      {image.description}
-                    </p>
-                  )}
-                </CardContent>
-              </Card>
+              </div>
             ))}
           </div>
         )}
