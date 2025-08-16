@@ -15,7 +15,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
   const { toast } = useToast();
   const isInCart = isItemInCart(product.id);
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
     addItem({
       id: product.id,
       name: product.name,
