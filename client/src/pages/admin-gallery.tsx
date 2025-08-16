@@ -251,7 +251,7 @@ const AdminGallery = () => {
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div className="flex items-center gap-4">
-            <Link href="/admin">
+            <Link href="/admin/dashboard">
               <Button variant="outline" size="sm" className="gap-2">
                 <ArrowLeft className="w-4 h-4" />
                 Zurück zum Dashboard
