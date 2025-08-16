@@ -35,13 +35,15 @@ import {
   Image as ImageIcon,
   Upload,
   Check,
-  ChevronsUpDown
+  ChevronsUpDown,
+  ArrowLeft
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { GalleryImage } from "@shared/schema";
 import type { UploadResult } from "@uppy/core";
 import { apiRequest } from "@/lib/queryClient";
 import { ObjectUploader } from "@/components/ObjectUploader";
+import { Link } from "wouter";
 
 const AdminGallery = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -178,26 +180,17 @@ const AdminGallery = () => {
   };
 
   const handleGetUploadParameters = async (file: any) => {
-    try {
-      console.log("Getting upload parameters for file:", file);
-      const response = await apiRequest("/api/objects/upload", "POST");
-      const data = await response.json();
-      console.log("Upload response received:", data);
-      
-      if (!data.uploadURL) {
-        throw new Error("No uploadURL in response");
-      }
-      
-      const result = {
-        method: "PUT" as const,
-        url: data.uploadURL,
-      };
-      console.log("Returning upload parameters:", result);
-      return result;
-    } catch (error) {
-      console.error("Failed to get upload parameters:", error);
-      throw error;
+    const response = await apiRequest("/api/objects/upload", "POST");
+    const data = await response.json();
+    
+    if (!data.uploadURL) {
+      throw new Error("No uploadURL in response");
     }
+    
+    return {
+      method: "PUT" as const,
+      url: data.uploadURL,
+    };
   };
 
   const handleUploadComplete = (result: UploadResult<Record<string, unknown>, Record<string, unknown>>) => {
@@ -257,13 +250,21 @@ const AdminGallery = () => {
       <div className="container mx-auto px-4">
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
-          <div>
-            <h1 className="font-heading text-3xl font-bold text-forest mb-2" data-testid="heading-admin-gallery">
-              Galerie-Verwaltung
-            </h1>
-            <p className="text-charcoal/70">
-              Verwalten Sie die Bilder in Ihrer Galerie
-            </p>
+          <div className="flex items-center gap-4">
+            <Link href="/admin">
+              <Button variant="outline" size="sm" className="gap-2">
+                <ArrowLeft className="w-4 h-4" />
+                Zurück zum Dashboard
+              </Button>
+            </Link>
+            <div>
+              <h1 className="font-heading text-3xl font-bold text-forest mb-2" data-testid="heading-admin-gallery">
+                Galerie-Verwaltung
+              </h1>
+              <p className="text-charcoal/70">
+                Verwalten Sie die Bilder in Ihrer Galerie
+              </p>
+            </div>
           </div>
           
           <Button 
