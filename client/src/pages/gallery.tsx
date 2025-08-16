@@ -245,19 +245,24 @@ const Gallery = () => {
 
               {/* Image */}
               {selectedImageIndex !== null && filteredImages[selectedImageIndex] && (
-                <div className="flex flex-col items-center justify-center w-full h-full p-2">
-                  <div className="flex-1 flex items-center justify-center w-full">
+                <div className="absolute inset-0 flex flex-col">
+                  <div className="flex-1 flex items-center justify-center p-4 min-h-0">
                     <img
                       src={filteredImages[selectedImageIndex].imageUrl}
                       alt={filteredImages[selectedImageIndex].altText}
-                      className="max-w-[95vw] max-h-[75vh] w-auto h-auto object-contain rounded-lg shadow-2xl"
-                      style={{ minHeight: '400px' }}
+                      className="w-full h-full object-contain rounded-lg shadow-2xl"
+                      style={{ 
+                        maxWidth: '90vw', 
+                        maxHeight: 'calc(100vh - 200px)',
+                        minWidth: '60vw',
+                        minHeight: '60vh'
+                      }}
                       data-testid={`lightbox-image-${filteredImages[selectedImageIndex].id}`}
                     />
                   </div>
                   
                   {/* Image Info */}
-                  <div className="text-center p-4 text-white max-w-4xl">
+                  <div className="text-center p-6 text-white bg-black/50 backdrop-blur-sm">
                     <h3 className="text-2xl font-semibold mb-2">
                       {filteredImages[selectedImageIndex].title}
                     </h3>
