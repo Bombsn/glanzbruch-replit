@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Link } from "wouter";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Clock, Users, MapPin, Star } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
@@ -29,16 +30,30 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const form = useForm<BookingFormData>({
-    resolver: zodResolver(insertCourseBookingSchema),
+    resolver: zodResolver(insertCourseBookingSchema.extend({
+      participants: z.coerce.number()
+        .min(1, "Mindestens 1 Teilnehmer erforderlich")
+        .max(course.availableSpots, `Maximal ${course.availableSpots} Plätze verfügbar`)
+    })),
     defaultValues: {
       courseId: course.id,
       customerName: "",
       customerEmail: "",
       customerPhone: "",
+      participants: 1,
       totalPrice: course.courseType.price,
       message: "",
     },
   });
+
+  // Watch participants field to calculate total price
+  const participants = form.watch("participants");
+  
+  useEffect(() => {
+    const basePrice = parseFloat(course.courseType.price);
+    const totalPrice = (basePrice * participants).toFixed(2);
+    form.setValue("totalPrice", totalPrice);
+  }, [participants, course.courseType.price, form]);
 
   const bookingMutation = useMutation({
     mutationFn: (data: BookingFormData) => apiRequest("POST", "/api/course-bookings", data),
@@ -169,6 +184,9 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
                 <DialogTitle className="text-forest">Kurs buchen</DialogTitle>
+                <DialogDescription>
+                  Füllen Sie das Formular aus, um eine Buchungsanfrage zu senden.
+                </DialogDescription>
               </DialogHeader>
               
               <div className="mb-4">
@@ -238,6 +256,43 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
                       </FormItem>
                     )}
                   />
+
+                  <FormField
+                    control={form.control}
+                    name="participants"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Anzahl Teilnehmer *</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value?.toString()}>
+                          <FormControl>
+                            <SelectTrigger data-testid="select-participants">
+                              <SelectValue placeholder="Wählen Sie die Anzahl Teilnehmer" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {Array.from({ length: Math.min(course.availableSpots, 8) }, (_, i) => i + 1).map((num) => (
+                              <SelectItem key={num} value={num.toString()}>
+                                {num} {num === 1 ? 'Person' : 'Personen'}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Display total price */}
+                  <div className="p-3 bg-sage/10 rounded-lg border border-sage/20">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-charcoal/70">
+                        Gesamtpreis ({participants} {participants === 1 ? 'Person' : 'Personen'}):
+                      </span>
+                      <span className="text-lg font-bold text-forest" data-testid="total-price-display">
+                        {formatPrice((parseFloat(course.courseType.price) * participants).toFixed(2))}
+                      </span>
+                    </div>
+                  </div>
 
                   <FormField
                     control={form.control}
