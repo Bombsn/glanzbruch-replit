@@ -165,12 +165,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Courses
+  // Courses - get upcoming course instances
   app.get("/api/courses", async (req, res) => {
     try {
-      // For now, return course types directly as we haven't seeded courses yet
-      const courseTypes = await storage.getCourseTypes();
-      res.json(courseTypes);
+      const allCourses = await storage.getCoursesWithTypes();
+      const now = new Date();
+      
+      // Filter for upcoming courses and sort by date
+      const upcomingCourses = allCourses
+        .filter(course => new Date(course.date) > now && course.status === 'scheduled')
+        .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      
+      res.json(upcomingCourses);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch courses" });
     }
