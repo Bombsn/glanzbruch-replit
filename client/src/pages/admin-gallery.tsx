@@ -30,10 +30,10 @@ const AdminGallery = () => {
 
   const categories = [
     { id: "all", name: "Alle Bilder" },
-    { id: "Silber und Bronze", name: "Silber und Bronze" },
-    { id: "Haare, Asche, Blüten, etc.", name: "Haare, Asche, Blüten, etc." },
-    { id: "Kunstharz", name: "Kunstharz" },
-    { id: "Tragebilder", name: "Tragebilder" },
+    { id: "silver-bronze", name: "Silber und Bronze" },
+    { id: "nature", name: "Haare, Asche, Blüten, etc." },
+    { id: "resin", name: "Kunstharz" },
+    { id: "worn", name: "Tragebilder" },
   ];
 
   // Load gallery images

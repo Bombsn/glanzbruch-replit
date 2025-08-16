@@ -10,10 +10,10 @@ const Gallery = () => {
 
   const categories = [
     { id: "all", name: "Alle Bilder", description: "Komplette Sammlung" },
-    { id: "Silber und Bronze", name: "Silber und Bronze", description: "Edle Metallarbeiten" },
-    { id: "Haare, Asche, Blüten, etc.", name: "Haare, Asche, Blüten", description: "Besondere Erinnerungsstücke" },
-    { id: "Kunstharz", name: "Kunstharz", description: "UV-Resin Kreationen" },
-    { id: "Tragebilder", name: "Tragebilder", description: "Schmuck in Aktion" },
+    { id: "silver-bronze", name: "Silber und Bronze", description: "Edle Metallarbeiten" },
+    { id: "nature", name: "Haare, Asche, Blüten", description: "Besondere Erinnerungsstücke" },
+    { id: "resin", name: "Kunstharz", description: "UV-Resin Kreationen" },
+    { id: "worn", name: "Tragebilder", description: "Schmuck in Aktion" },
   ];
 
   // Load gallery images from API
