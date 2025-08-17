@@ -59,28 +59,7 @@ const ShoppingCart = () => {
                       <h4 className="text-sm font-medium text-charcoal truncate">{item.name}</h4>
                       <p className="text-sm text-gold font-semibold">{formatPrice(item.price)}</p>
                     </div>
-                    <div className="flex items-center space-x-2">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        data-testid={`button-decrease-${item.id}`}
-                      >
-                        <Minus className="h-3 w-3" />
-                      </Button>
-                      <span className="w-8 text-center text-sm font-medium" data-testid={`quantity-${item.id}`}>
-                        {item.quantity}
-                      </span>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        data-testid={`button-increase-${item.id}`}
-                      >
-                        <Plus className="h-3 w-3" />
-                      </Button>
+                    <div className="flex items-center">
                       <Button
                         variant="outline"
                         size="icon"

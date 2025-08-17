@@ -2,14 +2,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
-  ShoppingBag,
-  HandHeart,
-  Star,
-  ChevronDown,
   Check,
-  Heart,
   CalendarPlus,
   NotebookPen,
+  Heart,
+  Star,
 } from "lucide-react";
 import { Link } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -17,8 +14,8 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useState } from "react";
 import ProductCard from "@/components/product-card";
+import HeroSection from "@/components/hero-section";
 import type { Product, CourseType } from "@shared/schema";
-import heroBackgroundImage from "@assets/hero_gb_1755361760256.jpg";
 
 const Home = () => {
   const { toast } = useToast();
@@ -64,84 +61,8 @@ const Home = () => {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        <div
-          className="absolute inset-0 bg-gradient-to-br from-forest/70 to-sage/50"
-          style={{
-            backgroundImage: `url(${heroBackgroundImage})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        />
-
-        <div className="relative z-10 text-center max-w-4xl mx-auto px-4">
-          <h1 className="font-logo md:text-6xl lg:text-7xl text-white mb-6 text-[94px]">
-            Wald- und Wiesenschmuck
-          </h1>
-
-          <p className="text-xl md:text-2xl text-cream mb-8 font-light leading-relaxed">
-            Wo die Magie der Natur in Schmuckstücken lebt
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <Link href="/shop">
-              <Button
-                className="bg-gold hover:bg-gold/90 text-white px-8 py-4 rounded-full font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
-                data-testid="button-shop-discover"
-              >
-                <ShoppingBag className="mr-2 w-5 h-5" />
-                Shop entdecken
-              </Button>
-            </Link>
-            <Link href="/kurse">
-              <Button
-                variant="outline"
-                className="border-2 border-white text-white hover:bg-white hover:text-forest px-8 py-4 rounded-full font-semibold transition-all duration-300"
-                data-testid="button-book-courses"
-              >
-                <HandHeart className="mr-2 w-5 h-5" />
-                Kurse buchen
-              </Button>
-            </Link>
-          </div>
-        </div>
-
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 text-white animate-bounce">
-          <ChevronDown className="w-8 h-8" />
-        </div>
-      </section>
-      {/* Brand Story */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2
-              className="font-heading text-3xl md:text-4xl font-bold text-forest mb-8"
-              data-testid="heading-welcome"
-            >
-              Willkommen bei Glanzbruch
-            </h2>
-            <div className="prose prose-lg mx-auto text-charcoal leading-relaxed">
-              <p className="text-lg md:text-xl mb-6">
-                Tief verwurzelt in der Schönheit des Waldes und der wilden
-                Wiesen entstehen in meinem Atelier zauberhafte Schmuckstücke,
-                die wie aus einer anderen Welt stammen.
-              </p>
-
-              <div className="bg-sage/10 rounded-lg p-6 my-8">
-                <p className="font-semibold text-forest text-lg">
-                  <strong>Mystisch, einzigartig und handgefertigt</strong> -
-                  Glanzbruch schafft Unikate, die dich als treue Begleiter im
-                  Alltag verzaubern.
-                </p>
-                <p className="font-heading text-2xl text-gold mt-4">
-                  Finde dein ganz persönliches Stück Ewigkeit.
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Hero Section with integrated Brand Story */}
+      <HeroSection />
       {/* Featured Products */}
       <section className="py-16 bg-cream">
         <div className="container mx-auto px-4">

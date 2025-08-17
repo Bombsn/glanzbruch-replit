@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
-import { ShoppingBag, Menu, X, ChevronDown, Gem } from "lucide-react";
+import { ShoppingCart, Menu, X, ChevronDown, Gem } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useCartStore } from "@/lib/store";
@@ -97,7 +97,7 @@ const Header = () => {
               className="relative p-2 text-charcoal hover:text-forest"
               data-testid="button-cart"
             >
-              <ShoppingBag className="w-6 h-6" />
+              <ShoppingCart className="w-6 h-6" />
               {itemCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-gold text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
                   {itemCount}

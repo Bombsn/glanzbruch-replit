@@ -38,9 +38,9 @@ const Shop = () => {
     { value: "price-high", label: "Preis: Hoch zu Niedrig" },
   ];
 
-  // Filter products by category
+  // Filter products by category and stock availability
   const filteredProducts = allProducts.filter((product) => 
-    selectedCategory === "all" || product.category === selectedCategory
+    (selectedCategory === "all" || product.category === selectedCategory) && product.inStock
   );
 
   // Sort products

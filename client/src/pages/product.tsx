@@ -180,25 +180,16 @@ const ProductPage = () => {
               {formatPrice(product.price)}
             </div>
 
-            {/* Stock Status */}
-            <div className="flex items-center space-x-2">
-              {product.inStock ? (
-                <>
-                  <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-                  <span className="text-green-600 font-medium">Auf Lager</span>
-                  {product.stockQuantity && product.stockQuantity <= 5 && (
-                    <span className="text-orange-600 text-sm">
-                      (Nur noch {product.stockQuantity} verfügbar)
-                    </span>
-                  )}
-                </>
-              ) : (
-                <>
-                  <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-                  <span className="text-red-600 font-medium">Ausverkauft</span>
-                </>
-              )}
-            </div>
+            {/* Low Stock Warning
+            {product.stockQuantity && product.stockQuantity <= 5 && (
+              <div className="flex items-center space-x-2">
+                <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                <span className="text-orange-600 font-medium">
+                  Nur noch {product.stockQuantity} verfügbar
+                </span>
+              </div>
+            )} */}
+
 
             {/* Add to Cart */}
             <Button
