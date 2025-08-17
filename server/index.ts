@@ -2,6 +2,11 @@ import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 
+// Simple check for fetch availability
+if (typeof globalThis.fetch === 'undefined') {
+  console.warn('fetch is not available in this Node.js environment. Object storage features will be disabled.');
+}
+
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -11,14 +16,26 @@ app.use((req, res, next) => {
   const path = req.path;
   let capturedJsonResponse: Record<string, any> | undefined = undefined;
 
+  // Debug logging for all requests
+  console.log(`🌍 Incoming request: ${req.method} ${req.url}`);
+  console.log(`📍 Request path: ${path}`);
+  console.log(`🔗 Request headers:`, req.headers);
+  
+  if (req.method === 'POST' && req.body) {
+    console.log(`📦 Request body:`, req.body);
+  }
+
   const originalResJson = res.json;
   res.json = function (bodyJson, ...args) {
     capturedJsonResponse = bodyJson;
+    console.log(`📤 Sending response:`, bodyJson);
     return originalResJson.apply(res, [bodyJson, ...args]);
   };
 
   res.on("finish", () => {
     const duration = Date.now() - start;
+    console.log(`✅ Request completed: ${req.method} ${path} ${res.statusCode} in ${duration}ms`);
+    
     if (path.startsWith("/api")) {
       let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
       if (capturedJsonResponse) {

@@ -233,7 +233,7 @@ export class DatabaseStorage implements IStorage {
 
   // Course Bookings
   async getCourseBookings(): Promise<CourseBooking[]> {
-    return await db.select().from(courseBookings);
+    return await db.select().from(courseBookings).orderBy(courseBookings.createdAt);
   }
 
   async getCourseBooking(id: string): Promise<CourseBooking | undefined> {

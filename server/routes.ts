@@ -114,51 +114,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Object Storage Routes - Real implementation
+  // Object Storage Routes - Placeholder implementation
   app.post("/api/objects/upload", async (req, res) => {
     try {
-      const privateObjectDir = process.env.PRIVATE_OBJECT_DIR;
-      if (!privateObjectDir) {
-        return res.status(500).json({ message: "PRIVATE_OBJECT_DIR not set" });
-      }
-
-      const objectId = crypto.randomUUID();
-      let fullPath = `${privateObjectDir}/gallery/${objectId}`;
-      
-      if (!fullPath.startsWith("/")) {
-        fullPath = `/${fullPath}`;
-      }
-      const pathParts = fullPath.split("/");
-      if (pathParts.length < 3) {
-        return res.status(500).json({ message: "Invalid path structure" });
-      }
-      const bucketName = pathParts[1];
-      const objectName = pathParts.slice(2).join("/");
-      
-      // Direct sidecar call
-      const request = {
-        bucket_name: bucketName,
-        object_name: objectName,
-        method: "PUT",
-        expires_at: new Date(Date.now() + 15 * 60 * 1000).toISOString(),
-      };
-      
-      const response = await fetch(
-        "http://127.0.0.1:1106/object-storage/signed-object-url",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(request),
-        }
-      );
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        return res.status(500).json({ message: "Failed to get signed URL", error: errorText });
-      }
-      
-      const { signed_url: uploadURL } = await response.json();
-      res.json({ uploadURL });
+      // Placeholder for object storage functionality
+      // This would need proper implementation with a fetch polyfill or HTTP client
+      res.status(501).json({ message: "Object storage upload not implemented yet" });
     } catch (error) {
       console.error("Failed to get upload URL:", error);
       res.status(500).json({ message: "Failed to get upload URL", error: (error as Error).message });
@@ -205,14 +166,62 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get course bookings
+  app.get("/api/course-bookings", async (req, res) => {
+    try {
+      const bookings = await storage.getCourseBookings();
+      res.json(bookings);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch course bookings" });
+    }
+  });
+
   // Course Bookings
   app.post("/api/course-bookings", async (req, res) => {
+    console.log('🎯 POST /api/course-bookings endpoint hit');
+    console.log('📥 Request headers:', req.headers);
+    console.log('📥 Request body:', req.body);
+    console.log('📥 Request method:', req.method);
+    console.log('📥 Request URL:', req.url);
+    
     try {
+      console.log('🔍 Starting validation...');
+      
+      // Validate the incoming data
       const validatedData = insertCourseBookingSchema.parse(req.body);
+      console.log('✅ Validation successful:', validatedData);
+      
+      // Check if course exists and has available spots
+      const course = await storage.getCourseWithType(validatedData.courseId);
+      if (!course) {
+        return res.status(404).json({ message: "Kurs nicht gefunden" });
+      }
+      
+      const participants = validatedData.participants || 1;
+      
+      if (course.availableSpots < participants) {
+        return res.status(400).json({ 
+          message: `Nicht genügend Plätze verfügbar. Nur noch ${course.availableSpots} Plätze frei.` 
+        });
+      }
+      
+      // Create the booking
       const booking = await storage.createCourseBooking(validatedData);
+      
+      // Update available spots
+      const newAvailableSpots = course.availableSpots - participants;
+      await storage.updateCourse(course.id, { 
+        availableSpots: newAvailableSpots 
+      });
+      
       res.status(201).json(booking);
     } catch (error) {
-      res.status(400).json({ message: "Invalid booking data", error });
+      console.error('Course booking error:', error);
+      if (error instanceof Error) {
+        res.status(400).json({ message: error.message });
+      } else {
+        res.status(400).json({ message: "Invalid booking data", error });
+      }
     }
   });
 
@@ -593,33 +602,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const privateDir = process.env.PRIVATE_OBJECT_DIR;
       const publicPaths = process.env.PUBLIC_OBJECT_SEARCH_PATHS;
       
-      // Direct sidecar test
-      const future_date = new Date(Date.now() + 15 * 60 * 1000).toISOString();
-      const request = {
-        bucket_name: "replit-objstore-764ac426-f2e7-40ac-8c3c-7996aea383ec",
-        object_name: ".private/gallery/debug-test",
-        method: "PUT",
-        expires_at: future_date,
-      };
-      
-      const response = await fetch(
-        "http://127.0.0.1:1106/object-storage/signed-object-url",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(request),
-        }
-      );
-      
-      const responseText = await response.text();
-      
       res.json({
         env: { privateDir, publicPaths },
-        sidecar: { 
-          ok: response.ok, 
-          status: response.status,
-          response: responseText
-        }
+        message: "Object storage debug endpoint - fetch calls removed"
       });
     } catch (error) {
       const err = error as Error;
@@ -632,12 +617,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Serve objects from storage
   app.get("/objects/:objectPath(*)", async (req, res) => {
     try {
+      // Check if object storage is available
+      if (typeof fetch === 'undefined') {
+        return res.status(503).json({ error: "Object storage not available in this environment" });
+      }
+      
       const objectStorageService = new ObjectStorageService();
       const objectFile = await objectStorageService.getObjectEntityFile(req.path);
       objectStorageService.downloadObject(objectFile, res);
     } catch (error) {
       console.error("Error serving object:", error);
-      res.status(404).json({ error: "Object not found" });
+      if (error instanceof Error && error.message.includes('fetch')) {
+        res.status(503).json({ error: "Object storage not available" });
+      } else {
+        res.status(404).json({ error: "Object not found" });
+      }
     }
   });
 

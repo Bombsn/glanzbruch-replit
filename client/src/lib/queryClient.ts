@@ -8,19 +8,36 @@ async function throwIfResNotOk(res: Response) {
 }
 
 export async function apiRequest(
-  url: string,
   method: string,
+  url: string,
   data?: unknown | undefined,
 ): Promise<Response> {
-  const res = await fetch(url, {
-    method,
-    headers: data ? { "Content-Type": "application/json" } : {},
-    body: data ? JSON.stringify(data) : undefined,
-    credentials: "include",
-  });
-
-  await throwIfResNotOk(res);
-  return res;
+  console.log(`🌐 Making ${method} request to ${url}`);
+  console.log('📋 Request headers:', data ? { "Content-Type": "application/json" } : {});
+  console.log('📦 Request body:', data ? JSON.stringify(data) : 'none');
+  
+  try {
+    console.log('🔍 About to call fetch...');
+    const res = await fetch(url, {
+      method,
+      headers: data ? { "Content-Type": "application/json" } : {},
+      body: data ? JSON.stringify(data) : undefined,
+      credentials: "include",
+    });
+    
+    console.log('📡 Fetch completed, response status:', res.status);
+    console.log('📊 Response headers:', Object.fromEntries(res.headers.entries()));
+    
+    await throwIfResNotOk(res);
+    console.log('✅ Response validation passed');
+    return res;
+  } catch (error) {
+    console.error('🚨 Fetch error occurred:', error);
+    console.error('🔍 Error type:', typeof error);
+    console.error('🔍 Error constructor:', (error as any)?.constructor?.name);
+    console.error('🔍 Is TypeError?', error instanceof TypeError);
+    throw error;
+  }
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";

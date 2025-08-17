@@ -446,7 +446,9 @@ const CourseDetailPage = () => {
                   <Users className="w-5 h-5 text-gold" />
                   <div>
                     <span className="font-medium text-charcoal">Teilnehmer:</span>
-                    <span className="ml-2 text-charcoal/80">Max. {course.maxParticipants} Personen</span>
+                    <span className="ml-2 text-charcoal/80">
+                      noch {course.availableSpots} Plätze frei (max. {course.maxParticipants} Personen)
+                    </span>
                   </div>
                 </div>
 

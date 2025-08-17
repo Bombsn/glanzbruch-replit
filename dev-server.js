@@ -2,18 +2,27 @@
 import { spawn } from 'child_process';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { config } from 'dotenv';
+
+// Load environment variables from .env file
+config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 console.log('🚀 Starting Glanzbruch Development Server...');
 console.log('📁 Project Directory:', __dirname);
-console.log('🌐 Server will be available at: http://localhost:3000');
+console.log('🌐 Server will be available at: http://localhost:5000');
 console.log('💡 Press Ctrl+C to stop\n');
 
 // Set environment variables
 process.env.NODE_ENV = 'development';
-process.env.PORT = '3000';
+process.env.PORT = process.env.PORT || '5000';
+
+console.log('🔍 Environment check:');
+console.log('  NODE_ENV:', process.env.NODE_ENV);
+console.log('  PORT:', process.env.PORT);
+console.log('  DATABASE_URL:', process.env.DATABASE_URL ? 'SET' : 'NOT SET');
 
 function startServer() {
   const serverProcess = spawn('npx', ['tsx', 'server/index.ts'], {

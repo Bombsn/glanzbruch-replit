@@ -52,8 +52,27 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
   }, [participants, course.courseType.price, form]);
 
   const bookingMutation = useMutation({
-    mutationFn: (data: BookingFormData) => apiRequest("POST", "/api/course-bookings", data),
+    mutationFn: async (data: BookingFormData) => {
+      console.log('🔄 Starting API request to /api/course-bookings');
+      console.log('📤 Request data:', data);
+      
+      try {
+        const response = await apiRequest("POST", "/api/course-bookings", data);
+        console.log('✅ API request successful:', response);
+        return response;
+      } catch (error) {
+        console.error('❌ API request failed:', error);
+        console.error('Error details:', {
+          name: (error as any)?.name,
+          message: (error as any)?.message,
+          stack: (error as any)?.stack,
+          cause: (error as any)?.cause
+        });
+        throw error;
+      }
+    },
     onSuccess: () => {
+      console.log('✅ Booking mutation succeeded');
       toast({
         title: "Buchungsanfrage gesendet",
         description: "Wir melden uns bald bei Ihnen bezüglich der Kurs-Details!",
@@ -63,17 +82,29 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
       queryClient.invalidateQueries({ queryKey: ["/api/course-bookings"] });
       queryClient.invalidateQueries({ queryKey: ["/api/courses"] });
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.error('❌ Booking mutation failed:', error);
+      console.error('Full error object:', JSON.stringify(error, null, 2));
       toast({
         title: "Fehler",
-        description: "Die Buchungsanfrage konnte nicht gesendet werden. Versuchen Sie es erneut.",
+        description: error?.message || "Die Buchungsanfrage konnte nicht gesendet werden. Versuchen Sie es erneut.",
         variant: "destructive",
       });
     },
   });
 
   const onSubmit = (data: BookingFormData) => {
-    bookingMutation.mutate(data);
+    console.log('Submitting booking data:', data);
+    
+    // Ensure participants is a number and totalPrice is a string
+    const bookingData = {
+      ...data,
+      participants: typeof data.participants === 'string' ? parseInt(data.participants, 10) : data.participants,
+      totalPrice: (parseFloat(course.courseType.price) * (data.participants || 1)).toFixed(2)
+    };
+    
+    console.log('Processed booking data:', bookingData);
+    bookingMutation.mutate(bookingData);
   };
 
   const formatPrice = (price: string) => {
@@ -146,7 +177,7 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
                   <div className="flex items-center">
                     <Users className="w-4 h-4 mr-2 text-gold" />
                     <span data-testid={`course-participants-${course.id}`}>
-                      Max. {course.maxParticipants} Teilnehmer
+                      noch {course.availableSpots} Plätze (max. {course.maxParticipants})
                     </span>
                   </div>
 
@@ -232,6 +263,7 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
                                 placeholder="Ihr vollständiger Name" 
                                 {...field} 
                                 data-testid="input-customer-name"
+                                required
                               />
                             </FormControl>
                             <FormMessage />
@@ -251,6 +283,7 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
                                 placeholder="ihre.email@example.com" 
                                 {...field} 
                                 data-testid="input-customer-email"
+                                required
                               />
                             </FormControl>
                             <FormMessage />
@@ -285,12 +318,16 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
                           <FormItem>
                             <FormLabel>Anzahl Teilnehmer *</FormLabel>
                             <Select 
-                              onValueChange={(value) => field.onChange(parseInt(value))} 
+                              onValueChange={(value) => {
+                                const numValue = parseInt(value, 10);
+                                field.onChange(numValue);
+                              }} 
                               value={field.value?.toString() || "1"}
+                              defaultValue="1"
                             >
                               <FormControl>
                                 <SelectTrigger data-testid="select-participants">
-                                  <SelectValue placeholder="1 Person" />
+                                  <SelectValue placeholder="Wählen Sie die Anzahl Teilnehmer" />
                                 </SelectTrigger>
                               </FormControl>
                               <SelectContent>
