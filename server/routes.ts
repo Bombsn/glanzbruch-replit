@@ -210,9 +210,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       // Update available spots
       const newAvailableSpots = course.availableSpots - participants;
-      await storage.updateCourse(course.id, { 
+      console.log(`🔄 Updating course ${course.id} available spots from ${course.availableSpots} to ${newAvailableSpots}`);
+      
+      const updatedCourse = await storage.updateCourse(course.id, { 
         availableSpots: newAvailableSpots 
       });
+      
+      console.log('📊 Course update result:', updatedCourse ? 'SUCCESS' : 'FAILED');
+      if (updatedCourse) {
+        console.log('✅ Updated course available spots:', updatedCourse.availableSpots);
+      } else {
+        console.error('❌ Course update failed - no course returned');
+      }
       
       res.status(201).json(booking);
     } catch (error) {

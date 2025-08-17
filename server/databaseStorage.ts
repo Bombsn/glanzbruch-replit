@@ -204,11 +204,25 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateCourse(id: string, course: Partial<InsertCourse>): Promise<Course | undefined> {
-    const [updatedCourse] = await db.update(courses)
-      .set(course)
-      .where(eq(courses.id, id))
-      .returning();
-    return updatedCourse || undefined;
+    console.log(`🔧 DatabaseStorage.updateCourse called with id: ${id}`, course);
+    
+    try {
+      const [updatedCourse] = await db.update(courses)
+        .set(course)
+        .where(eq(courses.id, id))
+        .returning();
+        
+      console.log('🔧 Database update result:', updatedCourse);
+      
+      if (!updatedCourse) {
+        console.error('❌ No course was updated - course ID might not exist');
+      }
+      
+      return updatedCourse || undefined;
+    } catch (error) {
+      console.error('❌ Database update error:', error);
+      throw error;
+    }
   }
 
   async deleteCourse(id: string): Promise<boolean> {
