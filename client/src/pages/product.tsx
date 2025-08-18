@@ -5,7 +5,7 @@ import { ShoppingBag, ArrowLeft, Heart, Share, Truck, Shield, Clock, Check } fro
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { useCartStore } from "@/lib/store";
+import { useCartStore, useWishlistStore } from "@/lib/store";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
 import type { Product } from "@shared/schema";
@@ -15,6 +15,7 @@ const ProductPage = () => {
   const productId = params?.id;
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const { addItem, isItemInCart } = useCartStore();
+  const { toggleItem: toggleWishlistItem, isItemInWishlist } = useWishlistStore();
   const { toast } = useToast();
 
   const { data: product, isLoading, error } = useQuery<Product>({
@@ -23,6 +24,7 @@ const ProductPage = () => {
   });
 
   const isInCart = product ? isItemInCart(product.id) : false;
+  const isInWishlist = product ? isItemInWishlist(product.id) : false;
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -38,6 +40,54 @@ const ProductPage = () => {
       title: "Zum Warenkorb hinzugefügt",
       description: `${product.name} wurde zu Ihrem Warenkorb hinzugefügt.`,
     });
+  };
+
+  const handleToggleWishlist = () => {
+    if (!product) return;
+    
+    toggleWishlistItem({
+      id: product.id,
+      name: product.name,
+      price: parseFloat(product.price),
+      imageUrl: product.imageUrls[0],
+    });
+    
+    toast({
+      title: isInWishlist ? "Von Merkliste entfernt" : "Zur Merkliste hinzugefügt",
+      description: isInWishlist 
+        ? `${product.name} wurde von Ihrer Merkliste entfernt.`
+        : `${product.name} wurde zu Ihrer Merkliste hinzugefügt.`,
+    });
+  };
+
+  const handleShare = async () => {
+    if (!product) return;
+
+    const shareData = {
+      title: product.name,
+      text: `Schau dir dieses wunderschöne Schmuckstück an: ${product.name} - ${formatPrice(product.price)}`,
+      url: window.location.href,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        // Fallback: Copy link to clipboard
+        await navigator.clipboard.writeText(window.location.href);
+        toast({
+          title: "Link kopiert",
+          description: "Der Produktlink wurde in die Zwischenablage kopiert.",
+        });
+      }
+    } catch (error) {
+      // If clipboard also fails, show the URL in a toast
+      toast({
+        title: "Link teilen",
+        description: `Kopiere diesen Link: ${window.location.href}`,
+        duration: 10000,
+      });
+    }
   };
 
   const formatPrice = (price: string) => {
@@ -218,11 +268,23 @@ const ProductPage = () => {
 
             {/* Action Buttons */}
             <div className="flex space-x-2">
-              <Button variant="outline" size="sm" className="flex-1">
-                <Heart className="w-4 h-4 mr-2" />
-                Merkliste
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className={`flex-1 ${isInWishlist ? "bg-gold/10 text-gold border-gold" : ""}`}
+                onClick={handleToggleWishlist}
+                data-testid="button-add-to-wishlist"
+              >
+                <Heart className={`w-4 h-4 mr-2 ${isInWishlist ? "fill-current" : ""}`} />
+                {isInWishlist ? "Von Merkliste entfernen" : "Zur Merkliste"}
               </Button>
-              <Button variant="outline" size="sm" className="flex-1">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex-1"
+                onClick={handleShare}
+                data-testid="button-share-product"
+              >
                 <Share className="w-4 h-4 mr-2" />
                 Teilen
               </Button>

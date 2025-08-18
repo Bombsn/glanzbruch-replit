@@ -2,19 +2,65 @@ import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger 
+} from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, Clock, Users, Plus, Edit, Trash2, LogOut, Home as HomeIcon, Package, BookOpen, ShoppingBag, Image as ImageIcon } from "lucide-react";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
+import { 
+  Calendar, 
+  Users, 
+  Clock, 
+  MapPin, 
+  Edit2, 
+  Edit,
+  Trash2, 
+  Plus,
+  Image as ImageIcon,
+  Home as HomeIcon,
+  LogOut,
+  Package,
+  BookOpen
+} from "lucide-react";
+import { Link } from "wouter";
+import { apiRequest } from "@/lib/queryClient";
+import { AdminHeader } from "@/components/AdminHeader";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertCourseSchema, type CourseType, type CourseWithType, type InsertCourse, type Product } from "@shared/schema";
-import { apiRequest } from "@/lib/queryClient";
-import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 import { ProductList } from "@/components/admin/product-list";
 import { ProductForm } from "@/components/admin/product-form";
@@ -89,7 +135,7 @@ const AdminDashboard = () => {
   });
 
   const createCourseMutation = useMutation({
-    mutationFn: (data: InsertCourse) => apiRequest("POST", "/api/admin/courses", data),
+    mutationFn: (data: InsertCourse) => apiRequest("/api/admin/courses", "POST", data),
     onSuccess: () => {
       toast({
         title: "Kurs erstellt",
@@ -110,7 +156,7 @@ const AdminDashboard = () => {
 
   const updateCourseMutation = useMutation({
     mutationFn: ({ courseId, data }: { courseId: string; data: any }) => 
-      apiRequest("PUT", `/api/admin/courses/${courseId}`, data),
+      apiRequest(`/api/admin/courses/${courseId}`, "PUT", data),
     onSuccess: () => {
       toast({
         title: "Kurs aktualisiert",
@@ -129,7 +175,7 @@ const AdminDashboard = () => {
   });
 
   const deleteCourseMutation = useMutation({
-    mutationFn: (courseId: string) => apiRequest("DELETE", `/api/admin/courses/${courseId}`),
+    mutationFn: (courseId: string) => apiRequest(`/api/admin/courses/${courseId}`, "DELETE"),
     onSuccess: () => {
       toast({
         title: "Kurs gelöscht",

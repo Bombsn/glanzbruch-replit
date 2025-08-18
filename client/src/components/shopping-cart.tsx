@@ -4,6 +4,7 @@ import { Separator } from "@/components/ui/separator";
 import { ShoppingBag, Plus, Minus, Trash2, CreditCard } from "lucide-react";
 import { useCartStore } from "@/lib/store";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "wouter";
 
 const ShoppingCart = () => {
   const { items, isOpen, toggleCart, updateQuantity, removeItem, getTotal } = useCartStore();
@@ -50,15 +51,17 @@ const ShoppingCart = () => {
               <div className="space-y-4">
                 {items.map((item) => (
                   <div key={item.id} className="flex items-center space-x-4 p-4 border rounded-lg">
-                    <img
-                      src={item.imageUrl}
-                      alt={item.name}
-                      className="w-16 h-16 object-cover rounded-md"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <h4 className="text-sm font-medium text-charcoal truncate">{item.name}</h4>
-                      <p className="text-sm text-gold font-semibold">{formatPrice(item.price)}</p>
-                    </div>
+                    <Link href={`/produkt/${item.id}`} onClick={toggleCart} className="flex items-center space-x-4 flex-1 min-w-0 cursor-pointer hover:opacity-80 transition-opacity">
+                      <img
+                        src={item.imageUrl}
+                        alt={item.name}
+                        className="w-16 h-16 object-cover rounded-md"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-sm font-medium text-charcoal truncate hover:text-forest transition-colors">{item.name}</h4>
+                        <p className="text-sm text-gold font-semibold">{formatPrice(item.price)}</p>
+                      </div>
+                    </Link>
                     <div className="flex items-center">
                       <Button
                         variant="outline"

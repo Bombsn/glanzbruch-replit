@@ -214,7 +214,7 @@ const Gallery = () => {
               Shop besuchen
             </Button>
             <Button 
-              onClick={() => window.location.href = "/kontakt"}
+              onClick={() => window.location.href = "/kontakt?tab=sonderanfertigung"}
               variant="outline"
               className="border-gold text-gold hover:bg-gold hover:text-white px-8 py-3 rounded-full font-semibold"
               data-testid="button-contact-custom-piece"

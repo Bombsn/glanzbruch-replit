@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   Check,
+  Calendar,
   CalendarPlus,
   NotebookPen,
   Heart,
@@ -14,8 +15,9 @@ import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { useState } from "react";
 import ProductCard from "@/components/product-card";
+import CourseInstanceCard from "@/components/course-instance-card";
 import HeroSection from "@/components/hero-section";
-import type { Product, CourseType } from "@shared/schema";
+import type { Product, CourseType, CourseWithType } from "@shared/schema";
 
 const Home = () => {
   const { toast } = useToast();
@@ -30,9 +32,13 @@ const Home = () => {
     queryKey: ["/api/course-types"],
   });
 
+  const { data: upcomingCourses = [] } = useQuery<CourseWithType[]>({
+    queryKey: ["/api/courses"],
+  });
+
   const newsletterMutation = useMutation({
     mutationFn: (email: string) =>
-      apiRequest("POST", "/api/newsletter", { email }),
+      apiRequest("/api/newsletter", "POST", { email }),
     onSuccess: () => {
       toast({
         title: "Erfolgreich angemeldet!",
@@ -58,6 +64,7 @@ const Home = () => {
 
   const featuredProducts = products;
   const featuredCourseType = courseTypes[0];
+  const nextCourse = upcomingCourses[0]; // Get the next available course
 
   return (
     <div className="min-h-screen">
@@ -102,7 +109,7 @@ const Home = () => {
       {featuredCourseType && (
         <section className="py-16 bg-white">
           <div className="container mx-auto px-4">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center mb-16">
               <div>
                 <img
                   src={featuredCourseType.imageUrl}
@@ -161,24 +168,40 @@ const Home = () => {
                     </span>
                   </div>
                 </div>
-
-                <div className="space-y-4">
-                  <Link href="/kurse">
-                    <Button
-                      className="bg-gold hover:bg-gold/90 text-white px-8 py-3 rounded-full font-semibold transition-all duration-300"
-                      data-testid="button-book-course"
-                    >
-                      <CalendarPlus className="mr-2 w-5 h-5" />
-                      Kurs buchen
-                    </Button>
-                  </Link>
-                  <div className="text-sm text-charcoal/70">
-                    <i className="fas fa-info-circle mr-1"></i>
-                    Kurse finden regelmässig statt. Kontaktiere mich für
-                    aktuelle Termine.
-                  </div>
-                </div>
               </div>
+            </div>
+
+          {/* Next Available Course */}
+          {nextCourse ? (
+            <div className="mb-8">
+              <h3 className="font-heading text-2xl font-bold text-forest mb-6 text-center">
+                Nächster verfügbarer Kurs
+              </h3>
+              <div className="max-w-4xl mx-auto">
+                <CourseInstanceCard course={nextCourse} />
+              </div>
+            </div>
+          ) : (
+            <div className="text-center py-8 bg-sage/10 rounded-xl mb-8">
+              <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-charcoal mb-2">Momentan keine Kurse verfügbar</h3>
+              <p className="text-charcoal/70">
+                Neue Kurstermine werden bald bekannt gegeben. Melden Sie sich für unseren Newsletter an.
+              </p>
+            </div>
+          )}
+
+            {/* All Courses Button */}
+            <div className="text-center">
+              <Link href="/kurse">
+                <Button
+                  className="bg-gold hover:bg-gold/90 text-white px-8 py-3 rounded-full font-semibold transition-all duration-300"
+                  data-testid="button-view-all-courses"
+                >
+                  <CalendarPlus className="mr-2 w-5 h-5" />
+                  Alle Kurse anzeigen
+                </Button>
+              </Link>
             </div>
           </div>
         </section>

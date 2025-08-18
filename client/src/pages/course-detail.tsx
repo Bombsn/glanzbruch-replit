@@ -71,7 +71,7 @@ const CourseDetailPage = () => {
   }, [participants, course, form]);
 
   const bookingMutation = useMutation({
-    mutationFn: (data: BookingFormData) => apiRequest("POST", "/api/course-bookings", data),
+    mutationFn: (data: BookingFormData) => apiRequest("/api/course-bookings", "POST", data),
     onSuccess: () => {
       toast({
         title: "Buchungsanfrage gesendet",
@@ -434,13 +434,13 @@ const CourseDetailPage = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center space-x-3">
+                {/* <div className="flex items-center space-x-3">
                   <Star className="w-5 h-5 text-gold" />
                   <div>
                     <span className="font-medium text-charcoal">Dauer:</span>
                     <span className="ml-2 text-charcoal/80">{course.courseType.duration}</span>
                   </div>
-                </div>
+                </div> */}
 
                 <div className="flex items-center space-x-3">
                   <Users className="w-5 h-5 text-gold" />

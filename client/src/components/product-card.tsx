@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ShoppingBag, ArrowRight, Check } from "lucide-react";
-import { useCartStore } from "@/lib/store";
+import { ShoppingBag, ArrowRight, Check, Heart } from "lucide-react";
+import { useCartStore, useWishlistStore } from "@/lib/store";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "wouter";
 import type { Product } from "@shared/schema";
@@ -12,8 +12,10 @@ interface ProductCardProps {
 
 const ProductCard = ({ product }: ProductCardProps) => {
   const { addItem, isItemInCart } = useCartStore();
+  const { toggleItem: toggleWishlistItem, isItemInWishlist } = useWishlistStore();
   const { toast } = useToast();
   const isInCart = isItemInCart(product.id);
+  const isInWishlist = isItemInWishlist(product.id);
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -29,6 +31,25 @@ const ProductCard = ({ product }: ProductCardProps) => {
     toast({
       title: "Zum Warenkorb hinzugefügt",
       description: `${product.name} wurde zu Ihrem Warenkorb hinzugefügt.`,
+    });
+  };
+
+  const handleToggleWishlist = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    toggleWishlistItem({
+      id: product.id,
+      name: product.name,
+      price: parseFloat(product.price),
+      imageUrl: product.imageUrls[0],
+    });
+    
+    toast({
+      title: isInWishlist ? "Von Merkliste entfernt" : "Zur Merkliste hinzugefügt",
+      description: isInWishlist 
+        ? `${product.name} wurde von Ihrer Merkliste entfernt.`
+        : `${product.name} wurde zu Ihrer Merkliste hinzugefügt.`,
     });
   };
 
@@ -121,28 +142,41 @@ const ProductCard = ({ product }: ProductCardProps) => {
             <ArrowRight className="text-sage w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </div>
           
-          <Button
-            onClick={handleAddToCart}
-            disabled={!product.inStock || isInCart}
-            className={`w-full ${
-              isInCart 
-                ? "bg-sage/20 text-sage border border-sage hover:bg-sage/30" 
-                : "bg-forest hover:bg-forest/90 text-white"
-            }`}
-            data-testid={`button-add-to-cart-${product.id}`}
-          >
-            {isInCart ? (
-              <>
-                <Check className="w-4 h-4 mr-2" />
-                Hinzugefügt
-              </>
-            ) : (
-              <>
-                <ShoppingBag className="w-4 h-4 mr-2" />
-                {product.inStock ? "In den Warenkorb" : "Ausverkauft"}
-              </>
-            )}
-          </Button>
+          <div className="flex space-x-2">
+            <Button
+              onClick={handleAddToCart}
+              disabled={!product.inStock || isInCart}
+              className={`flex-1 ${
+                isInCart 
+                  ? "bg-sage/20 text-sage border border-sage hover:bg-sage/30" 
+                  : "bg-forest hover:bg-forest/90 text-white"
+              }`}
+              data-testid={`button-add-to-cart-${product.id}`}
+            >
+              {isInCart ? (
+                <>
+                  <Check className="w-4 h-4 mr-2" />
+                  Hinzugefügt
+                </>
+              ) : (
+                <>
+                  <ShoppingBag className="w-4 h-4 mr-2" />
+                  {product.inStock ? "In den Warenkorb" : "Ausverkauft"}
+                </>
+              )}
+            </Button>
+            
+            <Button
+              onClick={handleToggleWishlist}
+              variant="outline"
+              size="icon"
+              className={`${isInWishlist ? "bg-gold/10 text-gold border-gold" : "border-forest text-forest hover:bg-forest hover:text-white"}`}
+              data-testid={`button-add-to-wishlist-${product.id}`}
+              title={isInWishlist ? "Von Merkliste entfernen" : "Zur Merkliste hinzufügen"}
+            >
+              <Heart className={`w-4 h-4 ${isInWishlist ? "fill-current" : ""}`} />
+            </Button>
+          </div>
         </div>
       </CardContent>
       </Link>

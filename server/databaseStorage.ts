@@ -36,7 +36,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getRandomProducts(count: number): Promise<Product[]> {
-    return await db.select().from(products).orderBy(sql`RANDOM()`).limit(count);
+    return await db.select().from(products).where(eq(products.inStock, true)).orderBy(sql`RANDOM()`).limit(count);
   }
 
   async getProduct(id: string): Promise<Product | undefined> {
@@ -45,7 +45,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getProductsByCategory(category: string): Promise<Product[]> {
-    return await db.select().from(products).where(eq(products.category, category));
+    return await db.select().from(products).where(and(eq(products.category, category), eq(products.inStock, true)));
   }
 
   async createProduct(product: InsertProduct): Promise<Product> {

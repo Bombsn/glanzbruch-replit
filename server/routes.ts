@@ -11,6 +11,7 @@ import {
   insertCommissionRequestSchema,
   insertGalleryImageSchema
 } from "@shared/schema";
+import { requireAdminAuth, addValidToken, removeValidToken } from "./middleware/auth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Products
@@ -60,7 +61,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin Product Management Routes
-  app.get("/api/admin/products", async (req, res) => {
+  app.get("/api/admin/products", requireAdminAuth, async (req, res) => {
     try {
       const products = await storage.getProducts();
       res.json(products);
@@ -69,7 +70,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.post("/api/admin/products", async (req, res) => {
+  app.post("/api/admin/products", requireAdminAuth, async (req, res) => {
     try {
       const productData = insertProductSchema.parse(req.body);
       const newProduct = await storage.createProduct(productData);
@@ -83,7 +84,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.put("/api/admin/products/:id", async (req, res) => {
+  app.put("/api/admin/products/:id", requireAdminAuth, async (req, res) => {
     try {
       const { id } = req.params;
       const productData = insertProductSchema.parse(req.body);
@@ -101,7 +102,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  app.delete("/api/admin/products/:id", async (req, res) => {
+  app.delete("/api/admin/products/:id", requireAdminAuth, async (req, res) => {
     try {
       const { id } = req.params;
       const deleted = await storage.deleteProduct(id);
@@ -289,10 +290,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Benutzername und Passwort sind erforderlich" });
       }
 
-      // Check for default admin credentials
-      if (username === "glanzbruch" && password === "admin2025") {
+      // Check admin credentials from environment variables
+      const adminUsername = process.env.ADMIN_USERNAME;
+      const adminPassword = process.env.ADMIN_PASSWORD;
+      
+      if (!adminUsername || !adminPassword) {
+        console.error("Admin credentials not configured in environment variables");
+        return res.status(500).json({ message: "Server-Konfigurationsfehler" });
+      }
+      
+      if (username === adminUsername && password === adminPassword) {
         // Create a simple token (in production, use JWT)
         const token = crypto.randomBytes(32).toString('hex');
+        // Store the token as valid
+        addValidToken(token);
         return res.json({ token, message: "Anmeldung erfolgreich" });
       }
 
@@ -303,8 +314,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin logout
+  app.post("/api/admin/logout", requireAdminAuth, async (req, res) => {
+    try {
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7);
+        removeValidToken(token);
+      }
+      res.json({ message: "Erfolgreich abgemeldet" });
+    } catch (error) {
+      console.error("Admin logout error:", error);
+      res.status(500).json({ message: "Serverfehler beim Abmelden" });
+    }
+  });
+
   // Get courses with course types for admin dashboard
-  app.get("/api/admin/courses", async (req, res) => {
+  app.get("/api/admin/courses", requireAdminAuth, async (req, res) => {
     try {
       const courses = await storage.getCoursesWithTypes();
       res.json(courses);
@@ -315,7 +341,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Create new course instance
-  app.post("/api/admin/courses", async (req, res) => {
+  app.post("/api/admin/courses", requireAdminAuth, async (req, res) => {
     try {
       const data = req.body;
       
@@ -342,7 +368,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Update course
-  app.put("/api/admin/courses/:id", async (req, res) => {
+  app.put("/api/admin/courses/:id", requireAdminAuth, async (req, res) => {
     try {
       const { id } = req.params;
       const data = req.body;
@@ -366,7 +392,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Delete course
-  app.delete("/api/admin/courses/:id", async (req, res) => {
+  app.delete("/api/admin/courses/:id", requireAdminAuth, async (req, res) => {
     try {
       const { id } = req.params;
       const success = await storage.deleteCourse(id);
@@ -393,7 +419,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Admin Gallery API Route - includes hidden images
-  app.get("/api/admin/gallery", async (req, res) => {
+  app.get("/api/admin/gallery", requireAdminAuth, async (req, res) => {
     try {
       const images = await storage.getAllGalleryImages();
       res.json(images);

@@ -57,7 +57,7 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
       console.log('📤 Request data:', data);
       
       try {
-        const response = await apiRequest("POST", "/api/course-bookings", data);
+        const response = await apiRequest("/api/course-bookings", "POST", data);
         console.log('✅ API request successful:', response);
         return response;
       } catch (error) {

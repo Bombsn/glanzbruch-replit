@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { Clock, Users, Calendar, Star } from "lucide-react";
+import { Clock, Users, Calendar, Star, MessageCircle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import CourseInstanceCard from "../components/course-instance-card";
 import type { CourseWithType } from "@shared/schema";
 
@@ -122,7 +123,7 @@ const Courses = () => {
               </p>
             </div>
           ) : (
-            <div>
+            <div className="max-w-4xl mx-auto">
               {courses.map((course, index) => (
                 <div key={course.id} className={index > 0 ? "mt-8" : ""}>
                   <CourseInstanceCard course={course} />
@@ -165,9 +166,17 @@ const Courses = () => {
             <p className="text-charcoal mb-4">
               <strong>Haben Sie Fragen zu den Kursen oder möchten Sie einen individuellen Termin vereinbaren?</strong>
             </p>
-            <p className="text-sm text-charcoal/70">
+            <p className="text-sm text-charcoal/70 mb-6">
               Kontaktieren Sie mich gerne für weitere Informationen oder spezielle Wünsche.
             </p>
+            <Button 
+              onClick={() => window.location.href = "/kontakt"}
+              className="bg-forest hover:bg-forest/90 text-white px-8 py-3 rounded-full font-semibold"
+              data-testid="button-contact-courses"
+            >
+              <MessageCircle className="w-4 h-4 mr-2" />
+              Kontakt
+            </Button>
           </div>
         </div>
       </div>

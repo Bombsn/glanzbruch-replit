@@ -19,6 +19,8 @@ import AdminGallery from "@/pages/admin-gallery";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import ShoppingCart from "@/components/shopping-cart";
+import Wishlist from "@/components/wishlist";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 
 function Router() {
   return (
@@ -32,8 +34,16 @@ function Router() {
       <Route path="/kontakt" component={Contact} />
       <Route path="/produkt/:id" component={ProductPage} />
       <Route path="/admin" component={AdminLogin} />
-      <Route path="/admin/dashboard" component={AdminDashboard} />
-      <Route path="/admin/gallery" component={AdminGallery} />
+      <Route path="/admin/dashboard">
+        <ProtectedRoute>
+          <AdminDashboard />
+        </ProtectedRoute>
+      </Route>
+      <Route path="/admin/gallery">
+        <ProtectedRoute>
+          <AdminGallery />
+        </ProtectedRoute>
+      </Route>
       <Route component={NotFound} />
     </Switch>
   );
@@ -66,6 +76,7 @@ function App() {
               </main>
               <Footer />
               <ShoppingCart />
+              <Wishlist />
             </Route>
           </Switch>
         </div>

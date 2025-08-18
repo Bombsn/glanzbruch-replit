@@ -216,30 +216,9 @@ const HeroSection = () => {
       <section className="py-16 bg-white relative z-10">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <h2
-              className="font-heading text-3xl md:text-4xl font-bold text-forest mb-8"
-              data-testid="heading-welcome"
-            >
-              Willkommen bei Glanzbruch
-            </h2>
-            <div className="prose prose-lg mx-auto text-charcoal leading-relaxed">
-              <p className="text-lg md:text-xl mb-6">
-                Tief verwurzelt in der Schönheit des Waldes und der wilden
-                Wiesen entstehen in meinem Atelier zauberhafte Schmuckstücke,
-                die wie aus einer anderen Welt stammen.
-              </p>
-
-              <div className="bg-sage/10 rounded-lg p-6 my-8">
-                <p className="font-semibold text-forest text-lg">
-                  <strong>Mystisch, einzigartig und handgefertigt</strong> -
-                  Glanzbruch schafft Unikate, die dich als treue Begleiter im
-                  Alltag verzaubern.
-                </p>
-                <p className="font-heading text-2xl text-gold mt-4">
-                  Finde dein ganz persönliches Stück Ewigkeit.
-                </p>
-              </div>
-            </div>
+            <p className="font-logo text-5xl md:text-6xl lg:text-7xl xl:text-8xl text-gold text-wrap-pretty">
+              Finde dein ganz persönliches Stück Ewigkeit.
+            </p>
           </div>
         </div>
       </section>

@@ -1,4 +1,5 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
+import { authUtils } from "./auth";
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
@@ -8,36 +9,37 @@ async function throwIfResNotOk(res: Response) {
 }
 
 export async function apiRequest(
-  method: string,
   url: string,
-  data?: unknown | undefined,
-): Promise<Response> {
-  console.log(`🌐 Making ${method} request to ${url}`);
-  console.log('📋 Request headers:', data ? { "Content-Type": "application/json" } : {});
-  console.log('📦 Request body:', data ? JSON.stringify(data) : 'none');
-  
-  try {
-    console.log('🔍 About to call fetch...');
-    const res = await fetch(url, {
-      method,
-      headers: data ? { "Content-Type": "application/json" } : {},
-      body: data ? JSON.stringify(data) : undefined,
-      credentials: "include",
-    });
-    
-    console.log('📡 Fetch completed, response status:', res.status);
-    console.log('📊 Response headers:', Object.fromEntries(res.headers.entries()));
-    
-    await throwIfResNotOk(res);
-    console.log('✅ Response validation passed');
-    return res;
-  } catch (error) {
-    console.error('🚨 Fetch error occurred:', error);
-    console.error('🔍 Error type:', typeof error);
-    console.error('🔍 Error constructor:', (error as any)?.constructor?.name);
-    console.error('🔍 Is TypeError?', error instanceof TypeError);
-    throw error;
+  method: "GET" | "POST" | "PUT" | "DELETE" = "GET",
+  data?: any
+) {
+  const config: RequestInit = {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      ...authUtils.getAuthHeaders(),
+    },
+  };
+
+  if (data) {
+    config.body = JSON.stringify(data);
   }
+
+  const response = await fetch(url, config);
+  
+  if (!response.ok) {
+    // If unauthorized and we have a token, it might be expired
+    if (response.status === 401 && authUtils.isAuthenticated()) {
+      authUtils.removeToken();
+      // Redirect to login if we're on an admin page
+      if (window.location.pathname.startsWith('/admin') && window.location.pathname !== '/admin') {
+        window.location.href = '/admin';
+      }
+    }
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+  
+  return response;
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";
@@ -45,9 +47,12 @@ export const getQueryFn: <T>(options: {
   on401: UnauthorizedBehavior;
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
-  async ({ queryKey }) => {
+  async ({ queryKey }: { queryKey: readonly unknown[] }) => {
     const res = await fetch(queryKey.join("/") as string, {
       credentials: "include",
+      headers: {
+        ...authUtils.getAuthHeaders(),
+      },
     });
 
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {
