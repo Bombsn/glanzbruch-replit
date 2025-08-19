@@ -7,12 +7,44 @@ import {
 import { Leaf, TreePine, Flower } from 'lucide-react';
 import { Link } from "wouter";
 import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useTypewriter } from "@/hooks/use-typewriter";
+import { useIntersectionObserver } from "@/hooks/use-intersection-observer";
+import type { GalleryImage } from "@shared/schema";
 
 const HeroSection = () => {
   const [scrollX, setScrollX] = useState(0);
   const [targetScrollX, setTargetScrollX] = useState(0);
   const [velocity, setVelocity] = useState(0);
   const [fadeOpacity, setFadeOpacity] = useState(1);
+
+  // Fetch gallery images for random selection
+  const { data: galleryImages = [] } = useQuery<GalleryImage[]>({
+    queryKey: ['/api/gallery'],
+  });
+
+  // Select a random gallery image (stable selection)
+  const [selectedImage, setSelectedImage] = useState<GalleryImage | null>(null);
+
+  useEffect(() => {
+    if (galleryImages.length > 0 && !selectedImage) {
+      const randomIndex = Math.floor(Math.random() * galleryImages.length);
+      setSelectedImage(galleryImages[randomIndex]);
+    }
+  }, [galleryImages, selectedImage]);
+
+  // Typewriter effect for the brand story section
+  const { elementRef: brandStoryRef, hasIntersected } = useIntersectionObserver({
+    threshold: 0.5, // Trigger when 50% of the section is visible (centered)
+    rootMargin: '0px'
+  });
+
+  const { displayText, isComplete } = useTypewriter({
+    text: "Finde dein ganz persönliches Stück Ewigkeit.",
+    speed: 80,
+    startDelay: 300,
+    trigger: hasIntersected
+  });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -41,6 +73,7 @@ const HeroSection = () => {
     const acceleration = 0.05; // How fast it starts moving
     const friction = 1.1; // How fast it slows down (car-like)
     const maxVelocity = 2; // Maximum speed
+    let animationId: number;
     
     const animateMovement = () => {
       setScrollX(prevScrollX => {
@@ -62,10 +95,14 @@ const HeroSection = () => {
         
         return prevScrollX + velocity;
       });
+      
+      // Continue animation loop
+      animationId = requestAnimationFrame(animateMovement);
     };
 
-    const intervalId = setInterval(animateMovement, 16); // ~60fps
-    return () => clearInterval(intervalId);
+    // Start animation loop
+    animationId = requestAnimationFrame(animateMovement);
+    return () => cancelAnimationFrame(animationId);
   }, [targetScrollX, velocity]);
 
   return (
@@ -212,13 +249,44 @@ const HeroSection = () => {
       </div>
     </section>
 
-      {/* Brand Story Section - Integrated */}
-      <section className="py-16 bg-white relative z-10">
+      {/* Brand Story Section - 100vh with Typewriter Effect */}
+      <section 
+        ref={brandStoryRef}
+        className="min-h-screen bg-white relative z-10 flex items-center justify-center overflow-hidden"
+      >
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <p className="font-logo text-5xl md:text-6xl lg:text-7xl xl:text-8xl text-gold text-wrap-pretty">
-              Finde dein ganz persönliches Stück Ewigkeit.
-            </p>
+            {/* Text Content */}
+            <div className="mb-12">
+              <p className="font-logo text-5xl md:text-6xl lg:text-7xl xl:text-8xl text-gold text-wrap-pretty leading-tight">
+                {displayText}
+              </p>
+            </div>
+            
+            {/* Gallery Image */}
+            <div className="flex justify-center">
+              {selectedImage && (
+                <div 
+                  className={`relative rounded-2xl overflow-hidden shadow-2xl transition-all duration-1000 transform ${
+                    isComplete 
+                      ? 'opacity-100 scale-100 translate-y-0' 
+                      : 'opacity-0 scale-95 translate-y-8'
+                  }`}
+                  style={{
+                    transitionDelay: isComplete ? '500ms' : '0ms'
+                  }}
+                >
+                  <img
+                    src={selectedImage.imageUrl.startsWith('/objects/') 
+                      ? selectedImage.imageUrl 
+                      : selectedImage.imageUrl}
+                    alt={selectedImage.altText}
+                    className="w-full h-auto max-w-lg max-h-[500px] object-cover rounded-2xl"
+                    loading="lazy"
+                  />
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </section>
