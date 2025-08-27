@@ -164,7 +164,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/all-courses", async (req, res) => {
     try {
       const allCourses = await storage.getCoursesWithTypes();
-      res.json(allCourses);
+      const now = new Date();
+      
+      // Filter for future courses only and keep database ordering
+      const futureCourses = allCourses
+        .filter(course => new Date(course.date) > now && course.status === 'scheduled');
+      
+      res.json(futureCourses);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch all courses" });
     }
