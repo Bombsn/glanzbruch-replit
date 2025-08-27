@@ -116,7 +116,8 @@ export class DatabaseStorage implements IStorage {
       }
     })
     .from(courses)
-    .leftJoin(courseTypes, eq(courses.courseTypeId, courseTypes.id));
+    .leftJoin(courseTypes, eq(courses.courseTypeId, courseTypes.id))
+    .orderBy(asc(courses.date));
 
     // Transform the result to match CourseWithType interface
     return result.map(row => ({
