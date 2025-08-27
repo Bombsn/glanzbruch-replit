@@ -6,7 +6,7 @@ import type { CourseWithType } from "@shared/schema";
 
 const Courses = () => {
   const { data: courses = [], isLoading } = useQuery<CourseWithType[]>({
-    queryKey: ["/api/courses"],
+    queryKey: ["/api/all-courses"],
   });
 
   if (isLoading) {

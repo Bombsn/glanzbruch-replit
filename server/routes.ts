@@ -127,7 +127,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Courses - get upcoming course instances
+  // Courses - get upcoming course instances (for homepage)
   app.get("/api/courses", async (req, res) => {
     try {
       const allCourses = await storage.getCoursesWithTypes();
@@ -141,6 +141,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(upcomingCourses);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch courses" });
+    }
+  });
+
+  // All courses - get all course instances (for courses page)
+  app.get("/api/all-courses", async (req, res) => {
+    try {
+      const allCourses = await storage.getCoursesWithTypes();
+      
+      // Sort all courses by date (newest first)
+      const sortedCourses = allCourses
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      
+      res.json(sortedCourses);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch all courses" });
     }
   });
 
