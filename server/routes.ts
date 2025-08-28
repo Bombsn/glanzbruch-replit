@@ -119,22 +119,50 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Object Storage Routes - Placeholder implementation
-  app.post("/api/objects/upload", async (req, res) => {
+  // Public object serving route
+  app.get("/public-objects/:filePath(*)", async (req, res) => {
+    const filePath = req.params.filePath;
+    const objectStorageService = new ObjectStorageService();
     try {
-      // Placeholder for object storage functionality
-      // This would need proper implementation with a fetch polyfill or HTTP client
-      res
-        .status(501)
-        .json({ message: "Object storage upload not implemented yet" });
+      const file = await objectStorageService.searchPublicObject(filePath);
+      if (!file) {
+        return res.status(404).json({ error: "File not found" });
+      }
+      objectStorageService.downloadObject(file, res);
     } catch (error) {
-      console.error("Failed to get upload URL:", error);
-      res
-        .status(500)
-        .json({
-          message: "Failed to get upload URL",
-          error: (error as Error).message,
-        });
+      console.error("Error searching for public object:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Admin Image Upload for Import
+  app.post("/api/admin/upload-image", requireAdminAuth, async (req, res) => {
+    try {
+      const { imageUrl, filename } = req.body;
+      
+      if (!imageUrl || !filename) {
+        return res.status(400).json({ message: "imageUrl and filename are required" });
+      }
+
+      console.log(`🖼️ Downloading image: ${imageUrl}`);
+      
+      // Use ObjectStorageService method to upload image
+      const objectStorageService = new ObjectStorageService();
+      const localPath = await objectStorageService.uploadImageFromUrl(imageUrl, filename);
+      
+      console.log(`✅ Image uploaded successfully: ${localPath}`);
+      
+      res.json({ 
+        localPath,
+        originalUrl: imageUrl
+      });
+      
+    } catch (error) {
+      console.error("Image upload error:", error);
+      res.status(500).json({ 
+        message: "Failed to upload image",
+        error: (error as Error).message 
+      });
     }
   });
 
