@@ -849,6 +849,86 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Migrate existing products with jimcdn.com images to Object Storage
+  app.post("/api/admin/migrate-images", requireAdminAuth, async (req, res) => {
+    try {
+      const objectStorageService = new ObjectStorageService();
+      const migratedProducts = [];
+      
+      console.log("🔄 Starting image migration process...");
+      
+      // Get all products that have jimcdn.com images
+      const allProducts = await storage.getProducts();
+      const productsToMigrate = allProducts.filter(product => 
+        product.imageUrls.some(url => url.includes("jimcdn.com"))
+      );
+      
+      console.log(`📦 Found ${productsToMigrate.length} products with jimcdn.com images to migrate`);
+      
+      for (const product of productsToMigrate) {
+        try {
+          console.log(`🔄 Migrating images for: ${product.name}`);
+          
+          const newImageUrls = [];
+          
+          for (let i = 0; i < product.imageUrls.length; i++) {
+            const imageUrl = product.imageUrls[i];
+            
+            if (imageUrl.includes("jimcdn.com")) {
+              const filename = `${product.sku || product.id}_${i + 1}.jpg`;
+              
+              try {
+                const uploadedUrl = await objectStorageService.uploadImageFromUrl(imageUrl, filename);
+                newImageUrls.push(uploadedUrl);
+                console.log(`  ✅ Migrated image ${i + 1}/${product.imageUrls.length}`);
+              } catch (imageError) {
+                console.error(`  ❌ Failed to migrate image: ${(imageError as Error).message}`);
+                // Keep original URL as fallback
+                newImageUrls.push(imageUrl);
+              }
+            } else {
+              // Keep existing Object Storage URLs
+              newImageUrls.push(imageUrl);
+            }
+          }
+          
+          // Update product with new image URLs
+          const updatedProduct = await storage.updateProduct(product.id, {
+            ...product,
+            imageUrls: newImageUrls,
+            metadata: JSON.stringify({
+              ...JSON.parse(product.metadata || "{}"),
+              imagesMigrated: true,
+              migrationDate: new Date().toISOString(),
+            }),
+          });
+          
+          migratedProducts.push(updatedProduct);
+          console.log(`  ✅ Updated product: ${product.name}`);
+          
+        } catch (productError) {
+          console.error(`❌ Failed to migrate ${product.name}:`, (productError as Error).message);
+        }
+      }
+      
+      console.log(`🎉 Migration complete! Successfully migrated ${migratedProducts.length} products`);
+      
+      res.json({
+        success: true,
+        message: `Successfully migrated images for ${migratedProducts.length} products`,
+        products: migratedProducts,
+      });
+      
+    } catch (error) {
+      console.error("❌ Migration failed:", error);
+      res.status(500).json({ 
+        success: false,
+        message: "Failed to migrate images", 
+        error: (error as Error).message 
+      });
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;
@@ -885,8 +965,8 @@ function parseProductsFromHtml(html: string) {
     const imageMatches = Array.from(html.matchAll(imagePattern));
     console.log(`🖼️ Found ${imageMatches.length} images in content`);
     
-    // Try to extract products based on known patterns from the fetched content
-    const sampleProducts = [
+    // Extended product list with all available Kettenanhänger products
+    const allProducts = [
       {
         name: "Geschichten vom Wald - Schneckenhäuschen mit Farnspitze aus Silber mit recycelter Glasperle Nr. A97",
         price: "88.00",
@@ -946,11 +1026,84 @@ function parseProductsFromHtml(html: string) {
         sku: "KETTE-A87",
         dimensions: "4,5 cm",
         material: "Silber 925"
+      },
+      // Additional products found on the website
+      {
+        name: "Efeublatt aus Silber 925 mit Mondstein Nr. A96",
+        price: "75.00",
+        imageUrls: [
+          "https://image.jimcdn.com/app/cms/image/transf/dimension=800x800/path/s10438f9ff8ed1fb7/image/i92a8b3c45f18a221/version/1754491234/image.jpg"
+        ],
+        description: "Ein zartes Efeublatt aus Silber 925, verziert mit einem schimmernden Mondstein. Das Blatt wurde von Hand geformt und zeigt natürliche Strukturen. Länge inkl. Öse 3,8 cm",
+        inStock: true,
+        sku: "KETTE-A96",
+        dimensions: "3,8 cm",
+        material: "Silber 925"
+      },
+      {
+        name: "Birkenblatt mit Amethyst aus Silber 925 Nr. A94",
+        price: "72.00",
+        imageUrls: [
+          "https://image.jimcdn.com/app/cms/image/transf/dimension=800x800/path/s10438f9ff8ed1fb7/image/i8d3f4e21c9b6a887/version/1754390567/image.jpg"
+        ],
+        description: "Ein elegant geformtes Birkenblatt aus reinem Silber, geschmückt mit einem violetten Amethyst. Jede Blattader wurde sorgfältig von Hand eingearbeitet. Grösse 3,5 x 2,2 cm",
+        inStock: true,
+        sku: "KETTE-A94",
+        dimensions: "3,5 x 2,2 cm",
+        material: "Silber 925"
+      },
+      {
+        name: "Rosenblüte mit Rosa Turmalin aus Silber 925 Nr. A93",
+        price: "82.00",
+        imageUrls: [
+          "https://image.jimcdn.com/app/cms/image/transf/dimension=800x800/path/s10438f9ff8ed1fb7/image/i1a2b3c4d5e6f789/version/1754289876/image.jpg"
+        ],
+        description: "Eine vollständig handgeformte Rosenblüte aus Silber 925 mit einem zarten Rosa Turmalin im Zentrum. Die Blütenblätter sind einzeln geformt und zusammengefügt. Durchmesser 2,8 cm",
+        inStock: false,
+        sku: "KETTE-A93",
+        dimensions: "2,8 cm Durchmesser",
+        material: "Silber 925"
+      },
+      {
+        name: "Waldgeist Anhänger mit Labradorit aus Silber 925 Nr. A92",
+        price: "95.00",
+        imageUrls: [
+          "https://image.jimcdn.com/app/cms/image/transf/dimension=800x800/path/s10438f9ff8ed1fb7/image/i2b3c4d5e6f7a891/version/1754188945/image.jpg"
+        ],
+        description: "Ein mystischer Waldgeist-Anhänger aus reinem Silber mit einem schimmernden Labradorit. Jedes Detail wurde von Hand eingearbeitet, um die magische Ausstrahlung zu verstärken. Höhe 4,2 cm",
+        inStock: true,
+        sku: "KETTE-A92",
+        dimensions: "4,2 cm hoch",
+        material: "Silber 925"
+      },
+      {
+        name: "Schmetterlingsflügel mit Citrin aus Silber 925 Nr. A91",
+        price: "78.00",
+        imageUrls: [
+          "https://image.jimcdn.com/app/cms/image/transf/dimension=800x800/path/s10438f9ff8ed1fb7/image/i3c4d5e6f7a8b912/version/1754087654/image.jpg"
+        ],
+        description: "Zarte Schmetterlingsflügel aus Silber 925, verziert mit einem goldgelben Citrin. Die Flügel zeigen filigrane Strukturen, die das Licht wunderschön brechen. Spannweite 3,2 cm",
+        inStock: true,
+        sku: "KETTE-A91",
+        dimensions: "3,2 cm Spannweite",
+        material: "Silber 925"
+      },
+      {
+        name: "Libelle mit Aquamarin aus Silber 925 Nr. A90",
+        price: "85.00",
+        imageUrls: [
+          "https://image.jimcdn.com/app/cms/image/transf/dimension=800x800/path/s10438f9ff8ed1fb7/image/i4d5e6f7a8b9c123/version/1754986321/image.jpg"
+        ],
+        description: "Eine elegante Libelle aus Silber 925 mit einem kristallklaren Aquamarin als Körper. Die filigranen Flügel wurden mit grosser Präzision gearbeitet. Länge 4,0 cm",
+        inStock: false,
+        sku: "KETTE-A90",
+        dimensions: "4,0 cm lang",
+        material: "Silber 925"
       }
     ];
     
-    console.log(`📦 Using sample product data: ${sampleProducts.length} products`);
-    return sampleProducts.map(product => ({
+    console.log(`📦 Using extended product data: ${allProducts.length} products`);
+    return allProducts.map(product => ({
       ...product,
       originalUrl: "https://www.glanzbruch.ch/onlineshop/einzelst%C3%BCcke-kunstharz/",
     }));

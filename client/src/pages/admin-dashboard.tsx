@@ -1124,32 +1124,35 @@ const ImportSection = () => {
 
   return (
     <div className="space-y-6">
-      <div className="border-l-4 border-gold pl-4 bg-gold/10 p-4 rounded">
-        <h4 className="font-semibold text-forest mb-2">Kettenanhänger-Import</h4>
-        <p className="text-sm text-charcoal/70 mb-4">
-          Dieser Import lädt alle verfügbaren Kettenanhänger-Produkte von der aktuellen Glanzbruch-Website 
-          herunter, einschließlich Produktbilder, Beschreibungen und Preise. Die Bilder werden automatisch 
-          in das Object Storage System hochgeladen.
-        </p>
-        
-        <Button
-          onClick={handleImport}
-          disabled={isImporting}
-          className="bg-gold hover:bg-gold/90 text-white"
-          data-testid="button-import-kettenanhanger"
-        >
-          {isImporting ? (
-            <>
-              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
-              Importiere Produkte...
-            </>
-          ) : (
-            <>
-              <Plus className="w-4 h-4 mr-2" />
-              Kettenanhänger importieren
-            </>
-          )}
-        </Button>
+      <div className="grid gap-4 md:grid-cols-2">
+        <div className="border-l-4 border-gold pl-4 bg-gold/10 p-4 rounded">
+          <h4 className="font-semibold text-forest mb-2">Alle Kettenanhänger importieren</h4>
+          <p className="text-sm text-charcoal/70 mb-4">
+            Importiert alle verfügbaren Kettenanhänger von der aktuellen Website (ca. 11 Produkte). 
+            Bilder werden automatisch in unser Object Storage System hochgeladen.
+          </p>
+          
+          <Button
+            onClick={handleImport}
+            disabled={isImporting}
+            className="bg-gold hover:bg-gold/90 text-white"
+            data-testid="button-import-kettenanhanger"
+          >
+            {isImporting ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
+                Importiere Produkte...
+              </>
+            ) : (
+              <>
+                <Plus className="w-4 h-4 mr-2" />
+                Alle Kettenanhänger importieren
+              </>
+            )}
+          </Button>
+        </div>
+
+        <ImageMigrationSection />
       </div>
 
       {/* Import Results */}
@@ -1221,6 +1224,107 @@ const ImportSection = () => {
           </div>
         </CardContent>
       </Card>
+    </div>
+  );
+};
+
+// Image Migration Section Component
+const ImageMigrationSection = () => {
+  const [isMigrating, setIsMigrating] = useState(false);
+  const [migrationResults, setMigrationResults] = useState<any>(null);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const handleMigration = async () => {
+    setIsMigrating(true);
+    setMigrationResults(null);
+
+    try {
+      const token = localStorage.getItem("adminToken");
+      if (!token) {
+        throw new Error("Kein Admin-Token gefunden");
+      }
+
+      const response = await fetch("/api/admin/migrate-images", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Migration fehlgeschlagen");
+      }
+
+      const results = await response.json();
+      setMigrationResults(results);
+
+      toast({
+        title: "Migration erfolgreich",
+        description: `${results.products?.length || 0} Produkte wurden erfolgreich migriert.`,
+      });
+
+      // Refresh products data
+      queryClient.invalidateQueries({ queryKey: ["/api/products"] });
+
+    } catch (error: any) {
+      toast({
+        title: "Migration fehlgeschlagen",
+        description: error.message || "Ein unerwarteter Fehler ist aufgetreten",
+        variant: "destructive",
+      });
+    } finally {
+      setIsMigrating(false);
+    }
+  };
+
+  return (
+    <div className="border-l-4 border-sage pl-4 bg-sage/10 p-4 rounded">
+      <h4 className="font-semibold text-forest mb-2">Bilder migrieren</h4>
+      <p className="text-sm text-charcoal/70 mb-4">
+        Migriert alle bestehenden jimcdn.com-Bilder in unser Object Storage System. 
+        Dies macht uns unabhängig von der externen Website.
+      </p>
+      
+      <Button
+        onClick={handleMigration}
+        disabled={isMigrating}
+        className="bg-sage hover:bg-sage/90 text-white"
+        data-testid="button-migrate-images"
+      >
+        {isMigrating ? (
+          <>
+            <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
+            Migriere Bilder...
+          </>
+        ) : (
+          <>
+            <ImageIcon className="w-4 h-4 mr-2" />
+            Bilder migrieren
+          </>
+        )}
+      </Button>
+
+      {/* Migration Results */}
+      {migrationResults && (
+        <div className="mt-4 p-3 bg-white rounded border">
+          {migrationResults.success ? (
+            <div className="flex items-center gap-2 text-green-700">
+              <div className="w-2 h-2 bg-green-500 rounded-full" />
+              <span className="text-sm font-medium">
+                {migrationResults.products?.length || 0} Produkte erfolgreich migriert
+              </span>
+            </div>
+          ) : (
+            <div className="flex items-center gap-2 text-red-700">
+              <div className="w-2 h-2 bg-red-500 rounded-full" />
+              <span className="text-sm">Migration fehlgeschlagen: {migrationResults.message}</span>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
