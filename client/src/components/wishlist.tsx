@@ -33,7 +33,7 @@ const Wishlist = () => {
 
   return (
     <Sheet open={isOpen} onOpenChange={toggleWishlist}>
-      <SheetContent className="w-[400px] sm:w-[540px]">
+      <SheetContent className="w-[400px] sm:w-[900px] lg:w-[1000px]">
         <SheetHeader>
           <SheetTitle className="font-heading text-xl text-forest flex items-center">
             <Heart className="w-5 h-5 mr-2 text-gold" />
@@ -108,7 +108,7 @@ const Wishlist = () => {
                   onClick={() => {
                     items.forEach(item => handleMoveToCart(item.id));
                   }}
-                  className="w-full bg-forest hover:bg-forest/90 text-white py-3 font-semibold"
+                  className="w-full bg-forest hover:bg-forest/90 text-white h-8 font-semibold"
                   data-testid="button-move-all-to-cart"
                 >
                   <ArrowRight className="w-4 h-4 mr-2" />

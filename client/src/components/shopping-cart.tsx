@@ -33,7 +33,7 @@ const ShoppingCart = () => {
 
   return (
     <Sheet open={isOpen} onOpenChange={toggleCart}>
-      <SheetContent className="w-[400px] sm:w-[540px]">
+      <SheetContent className="w-[400px] sm:w-[900px] lg:w-[1000px]">
         <SheetHeader>
           <SheetTitle className="font-heading text-xl text-forest">Warenkorb</SheetTitle>
         </SheetHeader>
@@ -92,7 +92,7 @@ const ShoppingCart = () => {
                 </div>
                 <Button 
                   onClick={handleCheckout}
-                  className="w-full bg-gold hover:bg-gold/90 text-white py-3 font-semibold"
+                  className="w-full bg-gold hover:bg-gold/90 text-white h-8 font-semibold"
                   data-testid="button-checkout"
                 >
                   <CreditCard className="w-4 h-4 mr-2" />

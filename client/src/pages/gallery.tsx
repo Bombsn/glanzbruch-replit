@@ -234,17 +234,6 @@ const Gallery = () => {
               <DialogTitle>Bildergalerie - Vergrößerte Ansicht</DialogTitle>
             </VisuallyHidden>
             <div className="relative w-full h-full flex items-center justify-center">
-              {/* Close Button */}
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute top-4 right-4 z-50 text-white hover:bg-white/20 rounded-full"
-                onClick={closeLightbox}
-                data-testid="button-close-lightbox"
-              >
-                <X className="w-6 h-6" />
-              </Button>
-
               {/* Previous Button */}
               {selectedImageIndex !== null && selectedImageIndex > 0 && (
                 <Button

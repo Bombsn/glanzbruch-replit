@@ -136,9 +136,9 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
           className="overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
           onClick={handleCardClick}
         >
-          <div className="flex">
+          <div className="flex flex-col md:flex-row">
             {/* Image Section */}
-            <div className="relative w-48 h-32 flex-shrink-0">
+            <div className="relative w-full md:w-64 h-48 md:h-auto flex-shrink-0">
               <img
                 src={course.courseType.imageUrl}
                 alt={course.courseType.name}
@@ -159,7 +159,7 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
                   {course.title}
                 </h3>
               
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-charcoal">
+                <div className="flex flex-col md:grid md:grid-cols-2 gap-2 text-sm text-charcoal">
                   <div className="flex items-center">
                     <Calendar className="w-4 h-4 mr-2 text-gold" />
                     <span data-testid={`course-date-${course.id}`}>
@@ -189,7 +189,7 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
                   </div>
 
                   {course.location && (
-                    <div className="flex items-center md:col-span-2">
+                    <div className="flex items-center">
                       <MapPin className="w-4 h-4 mr-2 text-gold" />
                       <span data-testid={`course-location-${course.id}`}>
                         {course.location}
@@ -234,13 +234,6 @@ const CourseInstanceCard = ({ course }: CourseInstanceCardProps) => {
           onPointerDownOutside={() => setIsDialogOpen(false)}
           onEscapeKeyDown={() => setIsDialogOpen(false)}
         >
-                  <DialogHeader>
-                    <DialogTitle className="text-forest">Kurs buchen</DialogTitle>
-                    <DialogDescription>
-                      Füllen Sie das Formular aus, um eine Buchungsanfrage zu senden.
-                    </DialogDescription>
-                  </DialogHeader>
-                  
                   <div className="mb-4">
                     <h4 className="font-semibold text-forest mb-2">{course.title}</h4>
                     <div className="text-sm text-charcoal/70 space-y-1">

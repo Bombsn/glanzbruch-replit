@@ -75,7 +75,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           <img
             src={product.imageUrls[0]}
             alt={product.name}
-            className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-105"
+            className="w-full h-64 object-cover transition-transform duration-300 group-hover:scale-105"
             data-testid={`product-image-${product.id}`}
           />
           {!product.inStock && (

@@ -119,17 +119,22 @@ const Footer = () => {
         <div className="border-t border-gray-700 mt-8 pt-8 text-center">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <p className="text-gray-400 text-sm">
-              © 2024 Glanzbruch. Alle Rechte vorbehalten.
+              © 2025 Glanzbruch. Alle Rechte vorbehalten.
             </p>
-            <div className="flex space-x-6 text-sm">
+            <p className="text-gray-400 text-sm">
+              Entwickelt von{" "}
+              <a 
+                href="https://www.scriptscanfly.ch" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="hover:opacity-80 transition-opacity duration-200 no-underline"
+              >
+                <span className="font-semibold" style={{color: 'rgb(255, 255, 255)'}}>scripts</span><span className="font-semibold" style={{color: 'rgb(255, 50, 67)'}}>Can</span><span className="font-semibold" style={{color: 'rgb(22, 255, 201)'}}>Fly</span>
+              </a>
+            </p>
+            <div className="grid grid-cols-2 gap-x-8 gap-y-2 md:flex md:space-x-6 text-sm">
               <a href="#" className="text-gray-400 hover:text-gold transition-colors" data-testid="footer-link-impressum">
                 Impressum
-              </a>
-              <a href="#" className="text-gray-400 hover:text-gold transition-colors" data-testid="footer-link-datenschutz">
-                Datenschutz
-              </a>
-              <a href="#" className="text-gray-400 hover:text-gold transition-colors" data-testid="footer-link-agb">
-                AGB
               </a>
               <a 
                 href="https://www.glanzbruch.ch/j/shop/deliveryinfo" 
@@ -137,6 +142,12 @@ const Footer = () => {
                 data-testid="footer-link-lieferbedingungen"
               >
                 Liefer- und Zahlungsbedingungen
+              </a>
+              <a href="#" className="text-gray-400 hover:text-gold transition-colors" data-testid="footer-link-datenschutz">
+                Datenschutz
+              </a>
+              <a href="#" className="text-gray-400 hover:text-gold transition-colors" data-testid="footer-link-agb">
+                AGB
               </a>
             </div>
           </div>
