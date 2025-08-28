@@ -340,7 +340,7 @@ const AdminDashboard = () => {
 
         {/* Tabs Navigation */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="overview" className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
               Übersicht
@@ -356,6 +356,10 @@ const AdminDashboard = () => {
             <TabsTrigger value="gallery" className="flex items-center gap-2">
               <ImageIcon className="w-4 h-4" />
               Galerie
+            </TabsTrigger>
+            <TabsTrigger value="import" className="flex items-center gap-2">
+              <Plus className="w-4 h-4" />
+              Import
             </TabsTrigger>
           </TabsList>
 
@@ -985,6 +989,22 @@ const AdminDashboard = () => {
               </CardContent>
             </Card>
           </TabsContent>
+
+          {/* Import Tab */}
+          <TabsContent value="import" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Produkt-Import</CardTitle>
+                <p className="text-charcoal/70">
+                  Importieren Sie Kettenanhänger-Produkte direkt von der aktuellen Website
+                </p>
+              </CardHeader>
+              
+              <CardContent className="space-y-6">
+                <ImportSection />
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
 
         {/* Product Form Modals */}
@@ -1046,6 +1066,161 @@ const AdminDashboard = () => {
           </AlertDialogContent>
         </AlertDialog>
       </div>
+    </div>
+  );
+};
+
+// Import Section Component
+const ImportSection = () => {
+  const [isImporting, setIsImporting] = useState(false);
+  const [importResults, setImportResults] = useState<any>(null);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const handleImport = async () => {
+    setIsImporting(true);
+    setImportResults(null);
+
+    try {
+      const token = localStorage.getItem("adminToken");
+      if (!token) {
+        throw new Error("Kein Admin-Token gefunden");
+      }
+
+      const response = await fetch("/api/admin/import-kettenanhanger", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Import fehlgeschlagen");
+      }
+
+      const results = await response.json();
+      setImportResults(results);
+
+      toast({
+        title: "Import erfolgreich",
+        description: `${results.products?.length || 0} Kettenanhänger wurden erfolgreich importiert.`,
+      });
+
+      // Refresh products data
+      queryClient.invalidateQueries({ queryKey: ["/api/products"] });
+
+    } catch (error: any) {
+      toast({
+        title: "Import fehlgeschlagen",
+        description: error.message || "Ein unerwarteter Fehler ist aufgetreten",
+        variant: "destructive",
+      });
+    } finally {
+      setIsImporting(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="border-l-4 border-gold pl-4 bg-gold/10 p-4 rounded">
+        <h4 className="font-semibold text-forest mb-2">Kettenanhänger-Import</h4>
+        <p className="text-sm text-charcoal/70 mb-4">
+          Dieser Import lädt alle verfügbaren Kettenanhänger-Produkte von der aktuellen Glanzbruch-Website 
+          herunter, einschließlich Produktbilder, Beschreibungen und Preise. Die Bilder werden automatisch 
+          in das Object Storage System hochgeladen.
+        </p>
+        
+        <Button
+          onClick={handleImport}
+          disabled={isImporting}
+          className="bg-gold hover:bg-gold/90 text-white"
+          data-testid="button-import-kettenanhanger"
+        >
+          {isImporting ? (
+            <>
+              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent mr-2" />
+              Importiere Produkte...
+            </>
+          ) : (
+            <>
+              <Plus className="w-4 h-4 mr-2" />
+              Kettenanhänger importieren
+            </>
+          )}
+        </Button>
+      </div>
+
+      {/* Import Results */}
+      {importResults && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-forest">Import-Ergebnisse</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {importResults.success ? (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-green-700">
+                  <div className="w-2 h-2 bg-green-500 rounded-full" />
+                  <span className="font-medium">
+                    {importResults.products?.length || 0} Produkte erfolgreich importiert
+                  </span>
+                </div>
+                
+                {importResults.products && importResults.products.length > 0 && (
+                  <div className="space-y-2">
+                    <h4 className="font-medium text-forest">Importierte Produkte:</h4>
+                    <div className="grid gap-2">
+                      {importResults.products.map((product: any) => (
+                        <div key={product.id} className="flex items-center gap-3 p-2 bg-sage/20 rounded">
+                          <div className="w-2 h-2 bg-sage rounded-full" />
+                          <div className="flex-1">
+                            <div className="font-medium text-sm">{product.name}</div>
+                            <div className="text-xs text-charcoal/60">
+                              CHF {product.price} • {product.sku} • 
+                              {product.inStock ? " Verfügbar" : " Ausverkauft"}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 text-red-700">
+                <div className="w-2 h-2 bg-red-500 rounded-full" />
+                <span>Import fehlgeschlagen: {importResults.message}</span>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-forest">Hinweise zum Import</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3 text-sm text-charcoal/70">
+          <div className="flex gap-2">
+            <span className="text-gold">•</span>
+            <span>Bereits existierende Produkte werden nicht überschrieben</span>
+          </div>
+          <div className="flex gap-2">
+            <span className="text-gold">•</span>
+            <span>Produktbilder werden automatisch optimiert und im Object Storage gespeichert</span>
+          </div>
+          <div className="flex gap-2">
+            <span className="text-gold">•</span>
+            <span>Der Import kann je nach Anzahl der Bilder einige Minuten dauern</span>
+          </div>
+          <div className="flex gap-2">
+            <span className="text-gold">•</span>
+            <span>Alle importierten Produkte erhalten automatisch Tags für bessere Kategorisierung</span>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

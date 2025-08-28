@@ -55,18 +55,6 @@ export class ObjectStorageService {
     return paths;
   }
 
-  // Gets the private object directory.
-  getPrivateObjectDir(): string {
-    const dir = process.env.PRIVATE_OBJECT_DIR || "";
-    if (!dir) {
-      throw new Error(
-        "PRIVATE_OBJECT_DIR not set. Create a bucket in 'Object Storage' " +
-          "tool and set PRIVATE_OBJECT_DIR env var."
-      );
-    }
-    return dir;
-  }
-
   // Search for a public object from the search paths.
   async searchPublicObject(filePath: string): Promise<File | null> {
     for (const searchPath of this.getPublicObjectSearchPaths()) {
@@ -92,7 +80,7 @@ export class ObjectStorageService {
     try {
       // Get file metadata
       const [metadata] = await file.getMetadata();
-
+      
       // Set appropriate headers
       res.set({
         "Content-Type": metadata.contentType || "application/octet-stream",
@@ -119,80 +107,44 @@ export class ObjectStorageService {
     }
   }
 
-  // Gets the upload URL for an object entity.
-  async getObjectEntityUploadURL(): Promise<string> {
-    const privateObjectDir = this.getPrivateObjectDir();
-    if (!privateObjectDir) {
-      throw new Error(
-        "PRIVATE_OBJECT_DIR not set. Create a bucket in 'Object Storage' " +
-          "tool and set PRIVATE_OBJECT_DIR env var."
-      );
-    }
+  // Upload image from URL to object storage
+  async uploadImageFromUrl(imageUrl: string, filename: string): Promise<string> {
+    try {
+      const searchPaths = this.getPublicObjectSearchPaths();
+      if (searchPaths.length === 0) {
+        throw new Error("No public search paths available");
+      }
 
-    const objectId = randomUUID();
-    const fullPath = `${privateObjectDir}/gallery/${objectId}`;
+      const publicPath = searchPaths[0]; // Use first public path
+      const { bucketName, objectName: basePath } = parseObjectPath(publicPath);
+      
+      // Create unique filename with path
+      const objectPath = `${basePath}/products/${filename}`;
+      const bucket = objectStorageClient.bucket(bucketName);
+      const file = bucket.file(objectPath);
 
-    const { bucketName, objectName } = parseObjectPath(fullPath);
+      // Download image from external URL
+      const response = await fetch(imageUrl);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch image: ${response.statusText}`);
+      }
 
-    // Sign URL for PUT method with TTL
-    return signObjectURL({
-      bucketName,
-      objectName,
-      method: "PUT",
-      ttlSec: 900,
-    });
-  }
+      const buffer = await response.arrayBuffer();
+      const uint8Array = new Uint8Array(buffer);
 
-  // Gets the object entity file from the object path.
-  async getObjectEntityFile(objectPath: string): Promise<File> {
-    if (!objectPath.startsWith("/objects/")) {
-      throw new ObjectNotFoundError();
-    }
+      // Upload to object storage
+      await file.save(uint8Array, {
+        metadata: {
+          contentType: response.headers.get('content-type') || 'image/jpeg',
+        },
+      });
 
-    const parts = objectPath.slice(1).split("/");
-    if (parts.length < 2) {
-      throw new ObjectNotFoundError();
+      // Return the public URL format
+      return `/public-objects/products/${filename}`;
+    } catch (error) {
+      console.error("Error uploading image from URL:", error);
+      throw error;
     }
-
-    const entityId = parts.slice(1).join("/");
-    let entityDir = this.getPrivateObjectDir();
-    if (!entityDir.endsWith("/")) {
-      entityDir = `${entityDir}/`;
-    }
-    const objectEntityPath = `${entityDir}${entityId}`;
-    const { bucketName, objectName } = parseObjectPath(objectEntityPath);
-    const bucket = objectStorageClient.bucket(bucketName);
-    const objectFile = bucket.file(objectName);
-    const [exists] = await objectFile.exists();
-    if (!exists) {
-      throw new ObjectNotFoundError();
-    }
-    return objectFile;
-  }
-
-  normalizeObjectEntityPath(
-    rawPath: string,
-  ): string {
-    if (!rawPath.startsWith("https://storage.googleapis.com/")) {
-      return rawPath;
-    }
-  
-    // Extract the path from the URL by removing query parameters and domain
-    const url = new URL(rawPath);
-    const rawObjectPath = url.pathname;
-  
-    let objectEntityDir = this.getPrivateObjectDir();
-    if (!objectEntityDir.endsWith("/")) {
-      objectEntityDir = `${objectEntityDir}/`;
-    }
-  
-    if (!rawObjectPath.startsWith(objectEntityDir)) {
-      return rawObjectPath;
-    }
-  
-    // Extract the entity ID from the path
-    const entityId = rawObjectPath.slice(objectEntityDir.length);
-    return `/objects/${entityId}`;
   }
 }
 
@@ -215,55 +167,4 @@ function parseObjectPath(path: string): {
     bucketName,
     objectName,
   };
-}
-
-async function signObjectURL({
-  bucketName,
-  objectName,
-  method,
-  ttlSec,
-}: {
-  bucketName: string;
-  objectName: string;
-  method: "GET" | "PUT" | "DELETE" | "HEAD";
-  ttlSec: number;
-}): Promise<string> {
-  // Check if fetch is available (Node.js 18+ or with polyfill)
-  if (typeof fetch === 'undefined') {
-    throw new Error('Object storage not available - fetch is not defined in this environment');
-  }
-
-  const request = {
-    bucket_name: bucketName,
-    object_name: objectName,
-    method,
-    expires_at: new Date(Date.now() + ttlSec * 1000).toISOString(),
-  };
-  
-  try {
-    const response = await fetch(
-      `${REPLIT_SIDECAR_ENDPOINT}/object-storage/signed-object-url`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(request),
-      }
-    );
-    if (!response.ok) {
-      throw new Error(
-        `Failed to sign object URL, errorcode: ${response.status}, ` +
-          `make sure you're running on Replit`
-      );
-    }
-
-    const { signed_url: signedURL } = await response.json();
-    return signedURL;
-  } catch (error) {
-    if (error instanceof TypeError && error.message.includes('fetch')) {
-      throw new Error('Object storage not available - fetch is not supported in this environment');
-    }
-    throw error;
-  }
 }
